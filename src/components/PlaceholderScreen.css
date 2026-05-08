@@ -1,0 +1,39 @@
+.bm-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.bm-placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  opacity: 0.9;
+}
+
+.bm-placeholder-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+  margin-bottom: 8px;
+}
+
+.bm-placeholder-subtitle {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 24px;
+}
+
+.bm-placeholder-badge {
+  background: rgba(255,215,0,0.15);
+  border: 1px solid rgba(255,215,0,0.4);
+  color: #FFD700;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
