@@ -21,7 +21,7 @@ import { db, firebaseConfig } from '../firebase';
 import './Users.css';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const toEmail = (username) => `${username.trim().toLowerCase()}@kaon.app`;
+const toEmail = (email) => email.trim().toLowerCase();
 
 const getInitials = (name) => {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -55,12 +55,12 @@ const getSecondaryAuth = () => {
 };
 
 // ─── Validators ───────────────────────────────────────────────────────────────
-const validateAdd = ({ username, fullName, whatsapp, password, confirmPassword }) => {
+const validateAdd = ({ loginEmail, fullName, whatsapp, password, confirmPassword }) => {
   const e = {};
-  if (!username.trim())
-    e.username = 'Username is required.';
-  else if (!/^[a-zA-Z0-9_]{3,20}$/.test(username.trim()))
-    e.username = '3–20 characters: letters, numbers and underscores only.';
+  if (!loginEmail.trim())
+    e.loginEmail = 'Email is required.';
+  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginEmail.trim()))
+    e.loginEmail = 'Enter a valid email address (e.g. ana@gmail.com).';
   if (!fullName.trim())
     e.fullName = 'Full name is required.';
   if (!whatsapp.trim())
@@ -102,7 +102,7 @@ const Modal = ({ onClose, children }) => (
 
 /** Add User Modal */
 const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
-  const EMPTY = { username: '', fullName: '', whatsapp: '', email: '', password: '', confirmPassword: '' };
+  const EMPTY = { loginEmail: '', fullName: '', whatsapp: '', password: '', confirmPassword: '' };
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [showPwd, setShowPwd] = useState(false);
@@ -127,25 +127,19 @@ const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
       </div>
 
       <div className="bmu-form-scroll">
-        {/* Username */}
+        {/* Login Email */}
         <div className="bmu-field">
-          <label className="bmu-label">Username <span className="bmu-required">*</span></label>
+          <label className="bmu-label">Email <span className="bmu-required">*</span></label>
           <input
-            className={`bmu-input ${errors.username ? 'error' : ''}`}
-            value={form.username}
-            onChange={set('username')}
-            placeholder="e.g. ana"
+            className={`bmu-input ${errors.loginEmail ? 'error' : ''}`}
+            value={form.loginEmail}
+            onChange={set('loginEmail')}
+            placeholder="e.g. ana@gmail.com"
+            type="email"
             autoCapitalize="none"
             autoCorrect="off"
           />
-          {errors.username
-            ? <FieldError msg={errors.username} />
-            : form.username.trim().length >= 3 && /^[a-zA-Z0-9_]+$/.test(form.username.trim()) && (
-              <div className="bmu-field-hint">
-                Logs in as <strong>{form.username.trim().toLowerCase()}@kaon.app</strong>
-              </div>
-            )
-          }
+          <FieldError msg={errors.loginEmail} />
         </div>
 
         {/* Full Name */}
@@ -171,21 +165,6 @@ const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
             type="tel"
           />
           <FieldError msg={errors.whatsapp} />
-        </div>
-
-        {/* Email (optional) */}
-        <div className="bmu-field">
-          <label className="bmu-label">
-            Email <span className="bmu-optional">(optional — for contact only)</span>
-          </label>
-          <input
-            className="bmu-input"
-            value={form.email}
-            onChange={set('email')}
-            placeholder="e.g. ana@gmail.com"
-            type="email"
-            autoCapitalize="none"
-          />
         </div>
 
         {/* Password */}
@@ -243,7 +222,6 @@ const EditUserModal = ({ user, onClose, onSave, saving, saveError }) => {
   const [form, setForm] = useState({
     fullName: user.fullName || '',
     whatsapp: user.whatsapp || '',
-    email: user.email || '',
   });
   const [errors, setErrors] = useState({});
 
@@ -267,7 +245,7 @@ const EditUserModal = ({ user, onClose, onSave, saving, saveError }) => {
         </div>
         <div>
           <div className="bmu-modal-title">Edit User</div>
-          <div className="bmu-modal-sub">@{user.username}</div>
+          <div className="bmu-modal-sub">{user.loginEmail}</div>
         </div>
       </div>
 
@@ -293,19 +271,8 @@ const EditUserModal = ({ user, onClose, onSave, saving, saveError }) => {
           <FieldError msg={errors.whatsapp} />
         </div>
 
-        <div className="bmu-field">
-          <label className="bmu-label">Email <span className="bmu-optional">(optional)</span></label>
-          <input
-            className="bmu-input"
-            value={form.email}
-            onChange={set('email')}
-            type="email"
-            autoCapitalize="none"
-          />
-        </div>
-
         <div className="bmu-info-note">
-          🔒 Username and password can only be changed via the Firebase Console.
+          🔒 Email and password can only be changed via the Firebase Console.
         </div>
 
         {saveError && <div className="bmu-save-error">⚠️ {saveError}</div>}
@@ -353,8 +320,7 @@ const UserCard = ({ user, onEdit, onToggleActive, onDelete }) => {
 
         <div className="bmu-card-info">
           <div className="bmu-card-name">{user.fullName}</div>
-          <div className="bmu-card-username">@{user.username}</div>
-          {user.email && <div className="bmu-card-email">✉️ {user.email}</div>}
+          <div className="bmu-card-username">✉️ {user.loginEmail}</div>
         </div>
 
         <div className={`bmu-badge ${user.active ? 'bmu-badge-active' : 'bmu-badge-disabled'}`}>
@@ -430,14 +396,14 @@ const Users = () => {
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
   // ── Add user ───────────────────────────────────────────────────────────────
-  const handleAddSave = async ({ username, fullName, whatsapp, email, password }) => {
+  const handleAddSave = async ({ loginEmail, fullName, whatsapp, password }) => {
     setSaving(true);
     setSaveError('');
     try {
       const secondaryAuth = getSecondaryAuth();
       const credential = await createUserWithEmailAndPassword(
         secondaryAuth,
-        toEmail(username),
+        toEmail(loginEmail),
         password
       );
       const { uid } = credential.user;
@@ -448,10 +414,9 @@ const Users = () => {
       // Save profile to Firestore
       await setDoc(doc(db, 'users', uid), {
         uid,
-        username: username.trim().toLowerCase(),
+        loginEmail: toEmail(loginEmail),
         fullName: fullName.trim(),
         whatsapp: whatsapp.trim(),
-        email: email.trim(),
         active: true,
         createdAt: serverTimestamp(),
       });
@@ -461,7 +426,7 @@ const Users = () => {
     } catch (err) {
       console.error('Add user error:', err);
       if (err.code === 'auth/email-already-in-use') {
-        setSaveError(`Username "${username.trim().toLowerCase()}" is already taken.`);
+        setSaveError(`An account with "${toEmail(loginEmail)}" already exists.`);
       } else if (err.code === 'auth/weak-password') {
         setSaveError('Password is too weak. Use at least 6 characters.');
       } else {
@@ -473,14 +438,13 @@ const Users = () => {
   };
 
   // ── Edit user ──────────────────────────────────────────────────────────────
-  const handleEditSave = async ({ fullName, whatsapp, email }) => {
+  const handleEditSave = async ({ fullName, whatsapp }) => {
     setSaving(true);
     setSaveError('');
     try {
       await updateDoc(doc(db, 'users', editTarget.uid), {
         fullName: fullName.trim(),
         whatsapp: whatsapp.trim(),
-        email: email.trim(),
       });
       setEditTarget(null);
       await fetchUsers();
@@ -522,9 +486,8 @@ const Users = () => {
     if (!q) return true;
     return (
       u.fullName?.toLowerCase().includes(q) ||
-      u.username?.toLowerCase().includes(q) ||
-      u.whatsapp?.includes(q) ||
-      u.email?.toLowerCase().includes(q)
+      u.loginEmail?.toLowerCase().includes(q) ||
+      u.whatsapp?.includes(q)
     );
   });
 
@@ -558,7 +521,7 @@ const Users = () => {
             className="bmu-search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, username, or number…"
+            placeholder="Search by name, email, or number…"
           />
           {search && (
             <button className="bmu-search-clear" onClick={() => setSearch('')}>✕</button>
