@@ -1,8 +1,9 @@
+/* src/App.css */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: linear-gradient(160deg, #1a0030 0%, #2d0050 50%, #1a1a00 100%);
+  background: #f4f6f9;
   min-height: 100vh;
 }
 
@@ -10,9 +11,115 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background: #f4f6f9;
 }
 
 .bm-screen-content {
   flex: 1;
   overflow-y: auto;
+}
+
+/* ── Confirmation Modal ── */
+.bm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  padding: 24px;
+  animation: bmFadeIn 0.15s ease-out;
+}
+
+@keyframes bmFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.bm-modal {
+  background: white;
+  border-radius: 18px;
+  padding: 28px 24px 22px;
+  width: 100%;
+  max-width: 340px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  animation: bmModalIn 0.2s ease-out;
+}
+
+@keyframes bmModalIn {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
+.bm-modal-icon {
+  font-size: 2.2rem;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.bm-modal-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.bm-modal-message {
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center;
+  margin-bottom: 22px;
+  line-height: 1.5;
+}
+
+.bm-modal-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.bm-modal-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.bm-modal-btn.cancel {
+  background: #f0f0f0;
+  color: #555;
+}
+
+.bm-modal-btn.cancel:hover {
+  background: #e4e4e4;
+  transform: none;
+  box-shadow: none;
+}
+
+.bm-modal-btn.confirm {
+  background: #4A0080;
+  color: white;
+  box-shadow: 0 3px 10px rgba(74,0,128,0.25);
+}
+
+.bm-modal-btn.confirm:hover {
+  background: #5c0099;
+  transform: none;
+  box-shadow: 0 4px 14px rgba(74,0,128,0.35);
+}
+
+.bm-modal-btn.danger {
+  background: #e53935;
+  color: white;
+  box-shadow: 0 3px 10px rgba(229,57,53,0.25);
+}
+
+.bm-modal-btn.danger:hover {
+  background: #c62828;
+  transform: none;
 }
