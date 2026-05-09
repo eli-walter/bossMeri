@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+// src/components/Login.jsx
+import React, { useState, useEffect } from 'react';
 import './Login.css';
 
 const Login = ({ onLogin, error, loading }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  // Return null for first 50ms to prevent flash of unstyled content
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 50);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     onLogin(email.trim(), password);
   };
+
+  if (!mounted) return null;
 
   return (
     <div className="bm-login-screen">
