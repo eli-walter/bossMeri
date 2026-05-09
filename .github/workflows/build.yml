@@ -1,3 +1,4 @@
+# .github/workflows/build.yml
 name: Build Boss Meri Android APK
 
 on:
@@ -15,13 +16,13 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '22'
+        node-version: '20'
 
     - name: Setup Java JDK
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '21'
+        java-version: '17'
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
@@ -43,31 +44,26 @@ jobs:
     - name: Sync Capacitor with Android
       run: npx cap sync android
 
-    - name: Install ImageMagick
-      run: sudo apt-get install -y imagemagick
-
     - name: Prepare assets for icon and splash generation
       run: |
         mkdir -p assets
-        # icon-only: used for the regular launcher icon
+        # icon-only: your icon as-is, no background
         cp public/assets/icon.png assets/icon-only.png
-        # adaptive icon layers (foreground = your icon, background = solid purple)
+        # foreground layer: your icon as-is
         cp public/assets/icon.png assets/icon-foreground.png
-        # Create a solid purple 1024x1024 background using ImageMagick
-        convert -size 1024x1024 xc:#4A0080 assets/icon-background.png
-        # splash: centre icon on purple background at 2732x2732
-        convert -size 2732x2732 xc:#4A0080 \
-          public/assets/splash.png -gravity center -composite \
-          assets/splash.png
+        # background layer: fully transparent 1024x1024
+        convert -size 1024x1024 xc:none assets/icon-background.png
+        # splash: your splash image as-is, no background added
+        cp public/assets/splash.png assets/splash.png
 
     - name: Generate Android icons and splash
       run: |
         npm install -g @capacitor/assets
         npx @capacitor/assets generate --android \
-          --iconBackgroundColor '#4A0080' \
-          --iconBackgroundColorDark '#4A0080' \
-          --splashBackgroundColor '#4A0080' \
-          --splashBackgroundColorDark '#4A0080' \
+          --iconBackgroundColor '#ffffff' \
+          --iconBackgroundColorDark '#ffffff' \
+          --splashBackgroundColor '#ffffff' \
+          --splashBackgroundColorDark '#ffffff' \
           --androidProject android
 
     - name: Update Android targetSdkVersion to 35
