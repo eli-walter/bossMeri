@@ -1,83 +1,61 @@
-/* src/components/Dashboard.css */
-.bm-dashboard {
-  padding: 24px 16px;
-  max-width: 700px;
-  margin: 0 auto;
-}
+import React from 'react';
+import './Dashboard.css';
 
-.bm-dashboard-greeting {
-  margin-bottom: 28px;
-}
+const CARDS = [
+  {
+    key: 'otaManKaon',
+    icon: '📋',
+    title: 'Ota Man Kaon',
+    description: "View and manage customers' credit records",
+    color: '#4A0080',
+  },
+  {
+    key: 'notifications',
+    icon: '🔔',
+    title: 'Notifications',
+    description: 'Alerts and updates from the market',
+    color: '#B8860B',
+  },
+  {
+    key: 'users',
+    icon: '👥',
+    title: 'Users',
+    description: 'Manage app users and access',
+    color: '#6B0099',
+  },
+  {
+    key: 'settings',
+    icon: '⚙️',
+    title: 'Settings',
+    description: 'Configure app preferences',
+    color: '#8B0000',
+  },
+];
 
-.bm-dashboard-greeting h2 {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
+const Dashboard = ({ onNavigate }) => {
+  return (
+    <div className="bm-dashboard">
+      <div className="bm-dashboard-greeting">
+        <h2>Welcome, Boss 👑</h2>
+        <p>What would you like to manage today?</p>
+      </div>
 
-.bm-dashboard-greeting p {
-  color: var(--text-secondary);
-  font-size: 0.95rem;
-}
+      <div className="bm-cards-grid">
+        {CARDS.map(card => (
+          <button
+            key={card.key}
+            className="bm-card"
+            style={{ '--card-color': card.color }}
+            onClick={() => onNavigate(card.key)}
+          >
+            <div className="bm-card-icon">{card.icon}</div>
+            <div className="bm-card-title">{card.title}</div>
+            <div className="bm-card-desc">{card.description}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
 
-.bm-cards-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.bm-card {
-  background: var(--card-bg);
-  border: none;
-  border-radius: 18px;
-  padding: 28px 18px 22px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  box-shadow: 0 1px 6px rgba(0,0,0,0.08), 0 2px 12px rgba(0,0,0,0.06);
-  position: relative;
-  overflow: hidden;
-}
-
-.bm-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: var(--card-color);
-  border-radius: 18px 18px 0 0;
-}
-
-.bm-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12), 0 6px 24px rgba(0,0,0,0.08);
-}
-
-.bm-card:active { transform: translateY(-1px); }
-
-.bm-card-icon  { font-size: 2.4rem; margin-bottom: 12px; line-height: 1; }
-
-.bm-card-title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  line-height: 1.2;
-}
-
-.bm-card-desc {
-  font-size: 0.78rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-@media (max-width: 400px) {
-  .bm-card { padding: 22px 14px 18px; }
-  .bm-card-icon { font-size: 2rem; }
-  .bm-card-title { font-size: 0.9rem; }
-  .bm-card-desc { font-size: 0.72rem; }
-}
+export default Dashboard;
