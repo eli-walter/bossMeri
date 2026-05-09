@@ -2,53 +2,59 @@ import React, { useState } from 'react';
 import './Login.css';
 
 const Login = ({ onLogin, error, loading }) => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin(email.trim(), password);
+    onLogin(username.trim(), password);
   };
 
   return (
-    <div className="bm-login-screen">
-      <div className="bm-login-card">
-        <div className="bm-login-header">
-          <div className="bm-login-crown">👑</div>
-          <h1>Boss Meri</h1>
-          <p>Elizabeth's Market Manager</p>
+    <div className="login-screen">
+      <div className="login-card">
+        <div className="login-header">
+          <img src="/assets/icon.png" alt="Kaon lo Elizabeth" className="login-icon" />
+          <h1>Kaon lo Elizabeth</h1>
+          <p>Credit Tracking Made Simple</p>
         </div>
 
-        <form className="bm-login-form" onSubmit={handleSubmit}>
-          <div className="bm-login-field">
-            <label htmlFor="email">Email</label>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="login-field">
+            <label htmlFor="username">Username</label>
             <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              autoComplete="email"
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter username"
+              autoComplete="username"
               required
             />
           </div>
 
-          <div className="bm-login-field">
+          <div className="login-field">
             <label htmlFor="password">Password</label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="Enter password"
               autoComplete="current-password"
               required
             />
           </div>
 
-          {error && <div className="bm-login-error">{error}</div>}
+          {error && (
+            <div className="login-error">{error}</div>
+          )}
 
-          <button type="submit" className="bm-login-btn" disabled={loading}>
+          <button
+            type="submit"
+            className="login-btn"
+            disabled={loading}
+          >
             {loading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
