@@ -22,7 +22,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '21'
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
@@ -50,13 +50,9 @@ jobs:
     - name: Prepare assets for icon and splash generation
       run: |
         mkdir -p assets
-        # icon-only: your icon as-is, no background
         cp public/assets/icon.png assets/icon-only.png
-        # foreground layer: your icon as-is
         cp public/assets/icon.png assets/icon-foreground.png
-        # background layer: fully transparent 1024x1024
         convert -size 1024x1024 xc:none assets/icon-background.png
-        # splash: your splash image as-is, no background added
         cp public/assets/splash.png assets/splash.png
 
     - name: Generate Android icons and splash
