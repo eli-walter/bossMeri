@@ -11,10 +11,18 @@ import SplashScreen from './components/SplashScreen';
 import Login from './components/Login';
 import TopBar from './components/TopBar';
 import Dashboard from './components/Dashboard';
+import Settings from './components/Settings';
 import PlaceholderScreen from './components/PlaceholderScreen';
 import './App.css';
 
-// Reusable confirmation modal
+const SETTINGS_KEY = 'bmSettings';
+
+const DEFAULT_SETTINGS = {
+  language: 'en',
+  fontSize: '16px',
+  theme: 'bright',
+};
+
 const ConfirmModal = ({ icon, title, message, confirmLabel, confirmClass, onConfirm, onCancel }) => (
   <div className="bm-modal-overlay">
     <div className="bm-modal">
@@ -30,14 +38,45 @@ const ConfirmModal = ({ icon, title, message, confirmLabel, confirmClass, onConf
 );
 
 function App() {
-  const [showSplash, setShowSplash]       = useState(true);
-  const [user, setUser]                   = useState(null);
-  const [authReady, setAuthReady]         = useState(false);
-  const [loginError, setLoginError]       = useState('');
-  const [loginLoading, setLoginLoading]   = useState(false);
-  const [activeScreen, setActiveScreen]   = useState('dashboard');
-  const [showExitModal, setShowExitModal] = useState(false);
+  const [showSplash, setShowSplash]           = useState(true);
+  const [user, setUser]                       = useState(null);
+  const [authReady, setAuthReady]             = useState(false);
+  const [loginError, setLoginError]           = useState('');
+  const [loginLoading, setLoginLoading]       = useState(false);
+  const [activeScreen, setActiveScreen]       = useState('dashboard');
+  const [showExitModal, setShowExitModal]     = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  // Load settings from localStorage or use defaults
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem(SETTINGS_KEY);
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
+  });
+
+  // Apply theme and font size to document root via CSS variables
+  useEffect(() => {
+    const root = document.documentElement;
+    const isDark = settings.theme === 'dark';
+
+    root.style.setProperty('--font-size-base', settings.fontSize);
+    root.style.setProperty('--bg-main',       isDark ? '#121212'   : '#f4f6f9');
+    root.style.setProperty('--card-bg',       isDark ? '#1e1e1e'   : '#ffffff');
+    root.style.setProperty('--text-primary',  isDark ? '#f0f0f0'   : '#1a1a2e');
+    root.style.setProperty('--text-secondary',isDark ? '#aaaaaa'   : '#666666');
+    root.style.setProperty('--divider',       isDark ? '#333333'   : '#eeeeee');
+    root.style.setProperty('--hover-bg',      isDark ? '#2a2a2a'   : '#faf8ff');
+    root.style.setProperty('--active-bg',     isDark ? '#2d1a40'   : '#f0e6ff');
+
+    document.body.style.background = isDark ? '#121212' : '#f4f6f9';
+    document.body.style.fontSize   = settings.fontSize;
+
+    // Save to localStorage
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  }, [settings]);
 
   // Restore Firebase Auth session
   useEffect(() => {
@@ -48,27 +87,21 @@ function App() {
     return unsubscribe;
   }, []);
 
-  // Hardware back button handler
+  // Hardware back button
   useEffect(() => {
     if (!user) return;
-
     let listener;
     const register = async () => {
       listener = await CapApp.addListener('backButton', () => {
         if (activeScreen !== 'dashboard') {
-          // Any sub-screen → go back to dashboard
           setActiveScreen('dashboard');
         } else {
-          // Already on dashboard → show exit confirmation
           setShowExitModal(true);
         }
       });
     };
     register();
-
-    return () => {
-      if (listener) listener.remove();
-    };
+    return () => { if (listener) listener.remove(); };
   }, [user, activeScreen]);
 
   const handleLogin = async (email, password) => {
@@ -95,31 +128,20 @@ function App() {
     }
   };
 
-  // Logout — show confirmation first
-  const handleLogoutRequest = () => {
-    setShowLogoutModal(true);
-  };
-
-  const handleLogoutConfirm = async () => {
+  const handleLogoutRequest  = () => setShowLogoutModal(true);
+  const handleLogoutConfirm  = async () => {
     setShowLogoutModal(false);
     await signOut(auth);
     setActiveScreen('dashboard');
   };
-
-  // Exit app confirm
-  const handleExitConfirm = async () => {
+  const handleExitConfirm    = async () => {
     setShowExitModal(false);
     await CapApp.exitApp();
   };
+  const handleNavigate       = (screen) => setActiveScreen(screen);
+  const handleSettingsChange = (newSettings) => setSettings(newSettings);
 
-  const handleNavigate = (screen) => {
-    setActiveScreen(screen);
-  };
-
-  if (showSplash) {
-    return <SplashScreen onComplete={() => setShowSplash(false)} />;
-  }
-
+  if (showSplash) return <SplashScreen onComplete={() => setShowSplash(false)} />;
   if (!authReady) return null;
 
   if (!user) {
@@ -135,26 +157,25 @@ function App() {
   const displayName = user.displayName || user.email;
 
   const renderScreen = () => {
-    if (activeScreen === 'dashboard') {
-      return <Dashboard onNavigate={handleNavigate} />;
+    switch (activeScreen) {
+      case 'dashboard': return <Dashboard onNavigate={handleNavigate} />;
+      case 'settings':  return <Settings settings={settings} onSettingsChange={handleSettingsChange} />;
+      default:          return <PlaceholderScreen screen={activeScreen} />;
     }
-    return <PlaceholderScreen screen={activeScreen} />;
   };
 
   return (
-    <div className="bm-app">
+    <div className={`bm-app theme-${settings.theme}`}>
       <TopBar
         activeScreen={activeScreen}
         onNavigate={handleNavigate}
         onLogout={handleLogoutRequest}
         userName={displayName}
       />
-
       <div className="bm-screen-content">
         {renderScreen()}
       </div>
 
-      {/* Exit app modal */}
       {showExitModal && (
         <ConfirmModal
           icon="🚪"
@@ -167,7 +188,6 @@ function App() {
         />
       )}
 
-      {/* Logout modal */}
       {showLogoutModal && (
         <ConfirmModal
           icon="👋"
