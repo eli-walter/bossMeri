@@ -14,7 +14,7 @@ const Login = ({ onLogin, error, loading }) => {
     <div className="bm-login-screen">
       <div className="bm-login-card">
         <div className="bm-login-header">
-          <img src="/assets/icon.png" alt="Boss Meri" className="bm-login-icon" />
+          <img src={process.env.PUBLIC_URL + "/assets/icon.png"} alt="Boss Meri" className="bm-login-icon" />
           <h1>Boss Meri</h1>
           <p>Elizabeth's Market Manager</p>
         </div>
