@@ -30,7 +30,7 @@ jobs:
       run: npm install
 
     - name: Install Capacitor CLI
-      run: npm install -g @capacitor/cli@^7.6.2
+      run: npm install -g @capacitor/cli@^8.3.1
 
     - name: Build React app
       env:
