@@ -1,56 +1,39 @@
-.bm-splash {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(135deg, #4A0080 0%, #B8860B 100%);
+/* src/components/PlaceholderScreen.css */
+.bm-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  animation: bmFadeIn 0.5s ease-in-out;
+  padding: 80px 24px;
+  text-align: center;
 }
-.bm-splash.fade-out { animation: bmFadeOut 0.5s ease-in-out forwards; }
 
-@keyframes bmFadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes bmFadeOut { to { opacity: 0; visibility: hidden; } }
-
-.bm-splash-icon {
-  font-size: 5rem;
-  animation: bmSlideUp 0.8s ease-out, bmPulse 2s ease-in-out infinite;
-  margin-bottom: 10px;
+.bm-placeholder-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  opacity: 0.9;
 }
-.bm-splash-title {
-  font-size: 2.8rem;
+
+.bm-placeholder-title {
+  font-size: 1.5rem;
   font-weight: 800;
-  color: #FFD700;
-  letter-spacing: 2px;
-  text-shadow: 0 2px 12px rgba(0,0,0,0.4);
-  animation: bmSlideUp 0.9s ease-out;
-}
-.bm-splash-subtitle {
-  font-size: 1.1rem;
-  color: rgba(255,255,255,0.85);
-  margin-top: 8px;
-  animation: bmFadeIn 1s ease-out 0.5s both;
-}
-.bm-splash-loader {
-  margin-top: 35px;
-  width: 48px;
-  height: 48px;
-  border: 4px solid rgba(255,215,0,0.3);
-  border-top: 4px solid #FFD700;
-  border-radius: 50%;
-  animation: bmSpin 1s linear infinite;
+  color: #1a1a2e;
+  margin-bottom: 8px;
 }
 
-@keyframes bmSlideUp {
-  from { transform: translateY(40px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
+.bm-placeholder-subtitle {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 24px;
 }
-@keyframes bmPulse {
-  0%, 100% { transform: scale(1); }
-  50%       { transform: scale(1.08); }
-}
-@keyframes bmSpin {
-  to { transform: rotate(360deg); }
+
+.bm-placeholder-badge {
+  background: #f0e6ff;
+  border: 1px solid #d4b3ff;
+  color: #4A0080;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
