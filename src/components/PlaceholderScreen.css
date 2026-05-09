@@ -1,3 +1,4 @@
+/* src/components/PlaceholderScreen.css */
 .bm-placeholder {
   display: flex;
   flex-direction: column;
@@ -7,30 +8,14 @@
   text-align: center;
 }
 
-.bm-placeholder-icon {
-  font-size: 4rem;
-  margin-bottom: 16px;
-  opacity: 0.9;
-}
-
-.bm-placeholder-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #FFD700;
-  text-shadow: 0 1px 6px rgba(0,0,0,0.3);
-  margin-bottom: 8px;
-}
-
-.bm-placeholder-subtitle {
-  font-size: 0.95rem;
-  color: rgba(255,255,255,0.6);
-  margin-bottom: 24px;
-}
+.bm-placeholder-icon     { font-size: 4rem; margin-bottom: 16px; opacity: 0.9; }
+.bm-placeholder-title    { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px; }
+.bm-placeholder-subtitle { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 24px; }
 
 .bm-placeholder-badge {
-  background: rgba(255,215,0,0.15);
-  border: 1px solid rgba(255,215,0,0.4);
-  color: #FFD700;
+  background: var(--active-bg);
+  border: 1px solid #d4b3ff;
+  color: #4A0080;
   padding: 8px 20px;
   border-radius: 20px;
   font-size: 0.85rem;
