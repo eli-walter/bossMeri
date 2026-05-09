@@ -33,7 +33,7 @@ const TopBar = ({ activeScreen, onNavigate, onLogout, userName }) => {
     <div className="bm-topbar">
       {/* Left: App Icon */}
       <div className="bm-topbar-icon">
-        <img src={process.env.PUBLIC_URL + "/assets/icon.png"} alt="Boss Meri" className="bm-topbar-icon-img" />
+        <img src={process.env.PUBLIC_URL + "/assets/topbar.png"} alt="Boss Meri" className="bm-topbar-icon-img" />
       </div>
 
       {/* Centre: App Name */}
