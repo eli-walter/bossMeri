@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// src/App.jsx
+import React, { useState, useEffect, useCallback } from 'react';
 import { auth } from './firebase';
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
+import { App as CapApp } from '@capacitor/app';
 import SplashScreen from './components/SplashScreen';
 import Login from './components/Login';
 import TopBar from './components/TopBar';
@@ -12,13 +14,30 @@ import Dashboard from './components/Dashboard';
 import PlaceholderScreen from './components/PlaceholderScreen';
 import './App.css';
 
+// Reusable confirmation modal
+const ConfirmModal = ({ icon, title, message, confirmLabel, confirmClass, onConfirm, onCancel }) => (
+  <div className="bm-modal-overlay">
+    <div className="bm-modal">
+      <div className="bm-modal-icon">{icon}</div>
+      <div className="bm-modal-title">{title}</div>
+      <div className="bm-modal-message">{message}</div>
+      <div className="bm-modal-buttons">
+        <button className="bm-modal-btn cancel" onClick={onCancel}>Cancel</button>
+        <button className={`bm-modal-btn ${confirmClass}`} onClick={onConfirm}>{confirmLabel}</button>
+      </div>
+    </div>
+  </div>
+);
+
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
-  const [user, setUser] = useState(null);
-  const [authReady, setAuthReady] = useState(false);
-  const [loginError, setLoginError] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [activeScreen, setActiveScreen] = useState('dashboard');
+  const [showSplash, setShowSplash]       = useState(true);
+  const [user, setUser]                   = useState(null);
+  const [authReady, setAuthReady]         = useState(false);
+  const [loginError, setLoginError]       = useState('');
+  const [loginLoading, setLoginLoading]   = useState(false);
+  const [activeScreen, setActiveScreen]   = useState('dashboard');
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   // Restore Firebase Auth session
   useEffect(() => {
@@ -28,6 +47,29 @@ function App() {
     });
     return unsubscribe;
   }, []);
+
+  // Hardware back button handler
+  useEffect(() => {
+    if (!user) return;
+
+    let listener;
+    const register = async () => {
+      listener = await CapApp.addListener('backButton', () => {
+        if (activeScreen !== 'dashboard') {
+          // Any sub-screen → go back to dashboard
+          setActiveScreen('dashboard');
+        } else {
+          // Already on dashboard → show exit confirmation
+          setShowExitModal(true);
+        }
+      });
+    };
+    register();
+
+    return () => {
+      if (listener) listener.remove();
+    };
+  }, [user, activeScreen]);
 
   const handleLogin = async (email, password) => {
     setLoginError('');
@@ -53,9 +95,21 @@ function App() {
     }
   };
 
-  const handleLogout = async () => {
+  // Logout — show confirmation first
+  const handleLogoutRequest = () => {
+    setShowLogoutModal(true);
+  };
+
+  const handleLogoutConfirm = async () => {
+    setShowLogoutModal(false);
     await signOut(auth);
     setActiveScreen('dashboard');
+  };
+
+  // Exit app confirm
+  const handleExitConfirm = async () => {
+    setShowExitModal(false);
+    await CapApp.exitApp();
   };
 
   const handleNavigate = (screen) => {
@@ -92,12 +146,39 @@ function App() {
       <TopBar
         activeScreen={activeScreen}
         onNavigate={handleNavigate}
-        onLogout={handleLogout}
+        onLogout={handleLogoutRequest}
         userName={displayName}
       />
+
       <div className="bm-screen-content">
         {renderScreen()}
       </div>
+
+      {/* Exit app modal */}
+      {showExitModal && (
+        <ConfirmModal
+          icon="🚪"
+          title="Exit App"
+          message="Are you sure you want to exit Boss Meri?"
+          confirmLabel="Exit"
+          confirmClass="danger"
+          onConfirm={handleExitConfirm}
+          onCancel={() => setShowExitModal(false)}
+        />
+      )}
+
+      {/* Logout modal */}
+      {showLogoutModal && (
+        <ConfirmModal
+          icon="👋"
+          title="Log Out"
+          message="Are you sure you want to log out of Boss Meri?"
+          confirmLabel="Log Out"
+          confirmClass="danger"
+          onConfirm={handleLogoutConfirm}
+          onCancel={() => setShowLogoutModal(false)}
+        />
+      )}
     </div>
   );
 }
