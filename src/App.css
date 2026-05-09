@@ -1,17 +1,34 @@
 /* src/App.css */
+
+/* ── CSS Variables (defaults = bright theme) ── */
+:root {
+  --font-size-base:  16px;
+  --bg-main:         #f4f6f9;
+  --card-bg:         #ffffff;
+  --text-primary:    #1a1a2e;
+  --text-secondary:  #666666;
+  --divider:         #eeeeee;
+  --hover-bg:        #faf8ff;
+  --active-bg:       #f0e6ff;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #f4f6f9;
+  background: var(--bg-main);
+  font-size: var(--font-size-base);
   min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .bm-app {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f4f6f9;
+  background: var(--bg-main);
+  font-size: var(--font-size-base);
+  transition: background 0.3s ease;
 }
 
 .bm-screen-content {
@@ -19,11 +36,78 @@ body {
   overflow-y: auto;
 }
 
+/* ── Dark theme overrides ── */
+.bm-app.theme-dark .bm-dropdown {
+  background: #1e1e1e;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+.bm-app.theme-dark .bm-dropdown-user {
+  background: #2a2a2a;
+  color: #cc99ff;
+}
+
+.bm-app.theme-dark .bm-dropdown-item {
+  color: #f0f0f0;
+}
+
+.bm-app.theme-dark .bm-dropdown-item:hover {
+  background: #2a2a2a;
+  color: #cc99ff;
+}
+
+.bm-app.theme-dark .bm-dropdown-item.active {
+  background: #2d1a40;
+  color: #cc99ff;
+}
+
+.bm-app.theme-dark .bm-dropdown-divider {
+  background: #333333;
+}
+
+.bm-app.theme-dark .bm-card {
+  background: #1e1e1e;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.3);
+}
+
+.bm-app.theme-dark .bm-card-title {
+  color: #f0f0f0;
+}
+
+.bm-app.theme-dark .bm-card-desc {
+  color: #aaaaaa;
+}
+
+.bm-app.theme-dark .bm-dashboard-greeting h2 {
+  color: #f0f0f0;
+}
+
+.bm-app.theme-dark .bm-dashboard-greeting p {
+  color: #aaaaaa;
+}
+
+.bm-app.theme-dark .bm-modal {
+  background: #1e1e1e;
+}
+
+.bm-app.theme-dark .bm-modal-title {
+  color: #f0f0f0;
+}
+
+.bm-app.theme-dark .bm-modal-message {
+  color: #aaaaaa;
+}
+
+.bm-app.theme-dark .bm-modal-btn.cancel {
+  background: #2a2a2a;
+  color: #aaaaaa;
+}
+
 /* ── Confirmation Modal ── */
 .bm-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0,0,0,0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,7 +122,7 @@ body {
 }
 
 .bm-modal {
-  background: white;
+  background: var(--card-bg);
   border-radius: 18px;
   padding: 28px 24px 22px;
   width: 100%;
@@ -52,32 +136,11 @@ body {
   to   { transform: scale(1);    opacity: 1; }
 }
 
-.bm-modal-icon {
-  font-size: 2.2rem;
-  text-align: center;
-  margin-bottom: 12px;
-}
+.bm-modal-icon    { font-size: 2.2rem; text-align: center; margin-bottom: 12px; }
+.bm-modal-title   { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 8px; }
+.bm-modal-message { font-size: 0.9rem; color: var(--text-secondary); text-align: center; margin-bottom: 22px; line-height: 1.5; }
 
-.bm-modal-title {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #1a1a2e;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.bm-modal-message {
-  font-size: 0.9rem;
-  color: #555;
-  text-align: center;
-  margin-bottom: 22px;
-  line-height: 1.5;
-}
-
-.bm-modal-buttons {
-  display: flex;
-  gap: 10px;
-}
+.bm-modal-buttons { display: flex; gap: 10px; }
 
 .bm-modal-btn {
   flex: 1;
@@ -90,36 +153,9 @@ body {
   transition: all 0.2s ease;
 }
 
-.bm-modal-btn.cancel {
-  background: #f0f0f0;
-  color: #555;
-}
-
-.bm-modal-btn.cancel:hover {
-  background: #e4e4e4;
-  transform: none;
-  box-shadow: none;
-}
-
-.bm-modal-btn.confirm {
-  background: #4A0080;
-  color: white;
-  box-shadow: 0 3px 10px rgba(74,0,128,0.25);
-}
-
-.bm-modal-btn.confirm:hover {
-  background: #5c0099;
-  transform: none;
-  box-shadow: 0 4px 14px rgba(74,0,128,0.35);
-}
-
-.bm-modal-btn.danger {
-  background: #e53935;
-  color: white;
-  box-shadow: 0 3px 10px rgba(229,57,53,0.25);
-}
-
-.bm-modal-btn.danger:hover {
-  background: #c62828;
-  transform: none;
-}
+.bm-modal-btn.cancel  { background: #f0f0f0; color: #555; }
+.bm-modal-btn.cancel:hover { background: #e4e4e4; transform: none; box-shadow: none; }
+.bm-modal-btn.confirm { background: #4A0080; color: white; box-shadow: 0 3px 10px rgba(74,0,128,0.25); }
+.bm-modal-btn.confirm:hover { background: #5c0099; transform: none; }
+.bm-modal-btn.danger  { background: #e53935; color: white; box-shadow: 0 3px 10px rgba(229,57,53,0.25); }
+.bm-modal-btn.danger:hover  { background: #c62828; transform: none; }
