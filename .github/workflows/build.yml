@@ -43,19 +43,34 @@ jobs:
     - name: Sync Capacitor with Android
       run: npx cap sync android
 
-    - name: Prepare assets folder for @capacitor/assets
+    - name: Prepare assets for icon and splash generation
       run: |
         mkdir -p assets
+        # icon-only: used for the regular launcher icon
         cp public/assets/icon.png assets/icon-only.png
-        cp public/assets/splash.png assets/splash.png
+        # adaptive icon layers (foreground = your icon, background = solid purple)
+        cp public/assets/icon.png assets/icon-foreground.png
+        # Create a solid purple 1024x1024 background using ImageMagick
+        convert -size 1024x1024 xc:#4A0080 assets/icon-background.png
+        # splash: centre icon on purple background at 2732x2732
+        convert -size 2732x2732 xc:#4A0080 \
+          public/assets/splash.png -gravity center -composite \
+          assets/splash.png
 
     - name: Generate Android icons and splash
       run: |
         npm install -g @capacitor/assets
         npx @capacitor/assets generate --android \
-          --iconBackgroundColor '#ffffff' \
+          --iconBackgroundColor '#4A0080' \
+          --iconBackgroundColorDark '#4A0080' \
           --splashBackgroundColor '#4A0080' \
+          --splashBackgroundColorDark '#4A0080' \
           --androidProject android
+
+    - name: Update Android targetSdkVersion to 35
+      run: |
+        sed -i 's/targetSdkVersion .*/targetSdkVersion 35/' android/app/build.gradle
+        sed -i 's/compileSdkVersion .*/compileSdkVersion 35/' android/app/build.gradle
 
     - name: Make gradlew executable
       working-directory: android
