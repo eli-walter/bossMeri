@@ -1,10 +1,15 @@
+// src/components/SplashScreen.jsx
 import React, { useEffect, useState } from 'react';
+import { SplashScreen as CapSplash } from '@capacitor/splash-screen';
 import './SplashScreen.css';
 
 const SplashScreen = ({ onComplete }) => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
+    // Hide the native splash now that React has mounted
+    CapSplash.hide({ fadeOutDuration: 200 });
+
     const t = setTimeout(() => {
       setVisible(false);
       setTimeout(onComplete, 500);
