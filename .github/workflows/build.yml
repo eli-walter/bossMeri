@@ -43,6 +43,9 @@ jobs:
     - name: Sync Capacitor with Android
       run: npx cap sync android
 
+    - name: Install ImageMagick
+      run: sudo apt-get install -y imagemagick
+
     - name: Prepare assets for icon and splash generation
       run: |
         mkdir -p assets
