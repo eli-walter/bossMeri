@@ -14,14 +14,14 @@
 
 /* Left icon */
 .bm-topbar-icon {
-  width: 70px;
+  width: 60px;
   display: flex;
   align-items: center;
 }
 
 .bm-topbar-icon-img {
-  height: 42px;
-  width: 42px;
+  height: 58px;
+  width: 58px;
   object-fit: contain;
   border-radius: 10px;
 }
