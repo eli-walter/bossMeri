@@ -7,7 +7,6 @@ const SplashScreen = ({ onComplete }) => {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    // Hide the native splash now that React has mounted
     CapSplash.hide({ fadeOutDuration: 200 });
 
     const t = setTimeout(() => {
@@ -19,9 +18,11 @@ const SplashScreen = ({ onComplete }) => {
 
   return (
     <div className={`bm-splash ${!visible ? 'fade-out' : ''}`}>
-      <div className="bm-splash-icon">👑</div>
-      <div className="bm-splash-title">Boss Meri</div>
-      <div className="bm-splash-subtitle">Elizabeth's Market Manager</div>
+      <img
+        src={process.env.PUBLIC_URL + '/assets/icon.png'}
+        alt="Boss Meri"
+        className="bm-splash-icon-img"
+      />
       <div className="bm-splash-loader"></div>
     </div>
   );
