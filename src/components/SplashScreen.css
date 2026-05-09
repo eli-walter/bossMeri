@@ -1,39 +1,52 @@
-/* src/components/PlaceholderScreen.css */
-.bm-placeholder {
+/* src/components/SplashScreen.css */
+.bm-splash {
+  position: fixed;
+  inset: 0;
+  background: #f4f6f9;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 24px;
-  text-align: center;
+  z-index: 9999;
+  animation: bmFadeIn 0.3s ease-in-out;
 }
 
-.bm-placeholder-icon {
-  font-size: 4rem;
-  margin-bottom: 16px;
-  opacity: 0.9;
+.bm-splash.fade-out {
+  animation: bmFadeOut 0.5s ease-in-out forwards;
 }
 
-.bm-placeholder-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #1a1a2e;
-  margin-bottom: 8px;
+@keyframes bmFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-.bm-placeholder-subtitle {
-  font-size: 0.95rem;
-  color: #888;
-  margin-bottom: 24px;
+@keyframes bmFadeOut {
+  to { opacity: 0; visibility: hidden; }
 }
 
-.bm-placeholder-badge {
-  background: #f0e6ff;
-  border: 1px solid #d4b3ff;
-  color: #4A0080;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+.bm-splash-icon-img {
+  width: 45vw;
+  max-width: 200px;
+  height: auto;
+  border-radius: 22%;
+  margin-bottom: 40px;
+  animation: bmSlideUp 0.6s ease-out;
+}
+
+@keyframes bmSlideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.bm-splash-loader {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(74, 0, 128, 0.15);
+  border-top: 3px solid #4A0080;
+  border-radius: 50%;
+  animation: bmSpin 1s linear infinite;
+}
+
+@keyframes bmSpin {
+  to { transform: rotate(360deg); }
 }
