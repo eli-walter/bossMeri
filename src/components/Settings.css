@@ -1,0 +1,219 @@
+/* src/components/Settings.css */
+.bm-settings {
+  padding: 24px 16px 40px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Header */
+.bm-settings-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.bm-settings-header-icon {
+  font-size: 2rem;
+}
+
+.bm-settings-header-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.bm-settings-header-sub {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* Section */
+.bm-settings-section {
+  margin-bottom: 24px;
+}
+
+.bm-settings-section-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  padding-left: 4px;
+}
+
+/* Card */
+.bm-settings-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.07), 0 2px 12px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.bm-settings-card-pad {
+  padding: 18px 16px;
+}
+
+.bm-settings-divider {
+  height: 1px;
+  background: var(--divider);
+  margin: 0 16px;
+}
+
+/* Option row */
+.bm-settings-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+  box-shadow: none;
+  border-radius: 0;
+  color: var(--text-primary);
+}
+
+.bm-settings-option:hover {
+  background: var(--hover-bg);
+  transform: none;
+  box-shadow: none;
+}
+
+.bm-settings-option.active {
+  background: var(--active-bg);
+}
+
+.bm-settings-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.bm-settings-option-icon {
+  font-size: 1.5rem;
+  width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.bm-settings-option-text {
+  flex: 1;
+}
+
+.bm-settings-option-title {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.bm-settings-option-sub {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.bm-settings-check {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #4A0080;
+  flex-shrink: 0;
+}
+
+.bm-settings-soon {
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #f0e6ff;
+  color: #4A0080;
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+/* Font size */
+.bm-font-preview {
+  text-align: center;
+  font-weight: 600;
+  color: var(--text-primary);
+  padding: 12px 0 18px;
+  transition: font-size 0.2s ease;
+  border-bottom: 1px solid var(--divider);
+  margin-bottom: 16px;
+}
+
+.bm-font-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.bm-font-btn {
+  flex: 1;
+  padding: 9px 4px;
+  border-radius: 10px;
+  border: 2px solid var(--divider);
+  background: var(--card-bg);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.bm-font-btn:hover {
+  border-color: #4A0080;
+  color: #4A0080;
+  transform: none;
+  box-shadow: none;
+}
+
+.bm-font-btn.active {
+  background: #4A0080;
+  border-color: #4A0080;
+  color: white;
+}
+
+.bm-font-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bm-font-slider-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.bm-font-slider-label.large {
+  font-size: 1.2rem;
+}
+
+.bm-font-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 4px;
+  background: linear-gradient(to right, #4A0080 0%, #4A0080 var(--val, 50%), var(--divider) var(--val, 50%));
+  outline: none;
+  cursor: pointer;
+}
+
+.bm-font-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #4A0080;
+  box-shadow: 0 2px 6px rgba(74,0,128,0.35);
+  cursor: pointer;
+  border: 3px solid white;
+}
