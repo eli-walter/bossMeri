@@ -15,7 +15,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '18'
+        node-version: '20'
 
     - name: Setup Java JDK
       uses: actions/setup-java@v4
@@ -30,24 +30,26 @@ jobs:
       run: npm install
 
     - name: Install Capacitor CLI
-      run: npm install -g @capacitor/cli
+      run: npm install -g @capacitor/cli@^7.6.2
 
     - name: Build React app
       env:
         REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
       run: npm run build
 
-    - name: Initialize Capacitor (if needed)
-      run: |
-        if [ ! -f "capacitor.config.json" ]; then
-          npx cap init "Boss Meri" "com.meresimi.bossmeri" --web-dir=build
-        fi
-
     - name: Add Android platform
       run: npx cap add android || echo "Android platform already exists"
 
     - name: Sync Capacitor with Android
       run: npx cap sync android
+
+    - name: Generate Android icons and splash from assets
+      run: |
+        npm install -g @capacitor/assets
+        npx capacitor-assets generate --android \
+          --iconPath public/assets/icon.png \
+          --splashPath public/assets/splash.png \
+          --androidProject android
 
     - name: Make gradlew executable
       working-directory: android
@@ -57,22 +59,12 @@ jobs:
       working-directory: android
       run: ./gradlew assembleDebug --stacktrace
 
+    - name: Rename APK
+      run: mv android/app/build/outputs/apk/debug/app-debug.apk android/app/build/outputs/apk/debug/Boss-Meri.apk
+
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
-        name: boss-meri-debug-apk
-        path: android/app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 30
-
-    - name: Build Android Release APK (unsigned)
-      working-directory: android
-      run: ./gradlew assembleRelease --stacktrace
-      continue-on-error: true
-
-    - name: Upload Release APK
-      uses: actions/upload-artifact@v4
-      if: success()
-      with:
-        name: boss-meri-release-apk
-        path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+        name: Boss-Meri
+        path: android/app/build/outputs/apk/debug/Boss-Meri.apk
         retention-days: 30
