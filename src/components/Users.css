@@ -1,0 +1,670 @@
+/* src/components/Users.css */
+
+/* ── Screen layout ───────────────────────────────────────────────────────── */
+.bmu-screen {
+  padding: 24px 16px 60px;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.bmu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.bmu-header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.bmu-header-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.bmu-header-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.bmu-header-sub {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.bmu-add-btn {
+  background: linear-gradient(135deg, #6B0099, #4A0080);
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 3px 10px rgba(74, 0, 128, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.bmu-add-btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 6px rgba(74, 0, 128, 0.3);
+}
+
+/* ── Search ──────────────────────────────────────────────────────────────── */
+.bmu-search-row {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1.5px solid var(--divider);
+  border-radius: 14px;
+  padding: 0 14px;
+  margin-bottom: 18px;
+  transition: border-color 0.2s;
+}
+
+.bmu-search-row:focus-within {
+  border-color: #9b30e0;
+}
+
+.bmu-search-icon {
+  font-size: 1rem;
+  margin-right: 8px;
+  opacity: 0.6;
+}
+
+.bmu-search {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 0;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.bmu-search::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+.bmu-search-clear {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
+
+/* ── Body ────────────────────────────────────────────────────────────────── */
+.bmu-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── User card ───────────────────────────────────────────────────────────── */
+.bmu-card {
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  border: 1.5px solid transparent;
+  transition: border-color 0.2s, opacity 0.2s;
+}
+
+.bmu-card-disabled {
+  opacity: 0.65;
+  border-color: var(--divider);
+}
+
+.bmu-card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.bmu-avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+.bmu-avatar-lg {
+  width: 52px;
+  height: 52px;
+  font-size: 1.2rem;
+}
+
+.bmu-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bmu-card-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bmu-card-username {
+  font-size: 0.82rem;
+  color: #9b30e0;
+  margin-top: 1px;
+  font-weight: 600;
+}
+
+.bmu-card-email {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bmu-badge {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 3px 10px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+.bmu-badge-active {
+  background: #e6f9ee;
+  color: #1a7f46;
+}
+
+.bmu-badge-disabled {
+  background: #fdeaea;
+  color: #c0392b;
+}
+
+/* Dark theme badge overrides */
+.bm-app.theme-dark .bmu-badge-active {
+  background: #1a3d2a;
+  color: #5edb8a;
+}
+
+.bm-app.theme-dark .bmu-badge-disabled {
+  background: #3d1a1a;
+  color: #e88080;
+}
+
+/* Card meta row */
+.bmu-card-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid var(--divider);
+  border-bottom: 1px solid var(--divider);
+  margin-bottom: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.bmu-wa-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #1a7f46;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.bmu-wa-link:hover {
+  opacity: 0.8;
+}
+
+.bmu-wa-icon {
+  font-size: 1rem;
+}
+
+.bmu-card-date {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+/* Card actions */
+.bmu-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.bmu-action-btn {
+  flex: 1;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  text-align: center;
+}
+
+.bmu-action-btn:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+.bmu-action-edit {
+  background: var(--active-bg);
+  color: #6B0099;
+  flex: 2;
+}
+
+.bmu-action-disable {
+  background: #fdeaea;
+  color: #c0392b;
+  flex: 2;
+}
+
+.bmu-action-enable {
+  background: #e6f9ee;
+  color: #1a7f46;
+  flex: 2;
+}
+
+.bmu-action-delete {
+  background: var(--hover-bg);
+  color: var(--text-secondary);
+  flex: 0.7;
+  border: 1.5px solid var(--divider);
+}
+
+/* Dark theme action buttons */
+.bm-app.theme-dark .bmu-action-edit {
+  background: #2d1a40;
+  color: #cc99ff;
+}
+
+.bm-app.theme-dark .bmu-action-disable {
+  background: #3d1a1a;
+  color: #e88080;
+}
+
+.bm-app.theme-dark .bmu-action-enable {
+  background: #1a3d2a;
+  color: #5edb8a;
+}
+
+.bm-app.theme-dark .bmu-action-delete {
+  background: #1e1e1e;
+  color: #aaaaaa;
+}
+
+/* ── Empty states ────────────────────────────────────────────────────────── */
+.bmu-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 56px 24px;
+  gap: 12px;
+}
+
+.bmu-empty-icon {
+  font-size: 3rem;
+}
+
+.bmu-empty-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.bmu-empty-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  max-width: 300px;
+  line-height: 1.5;
+}
+
+.bmu-retry-btn {
+  margin-top: 4px;
+}
+
+/* ── Spinner ─────────────────────────────────────────────────────────────── */
+.bmu-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: bmu-spin 0.7s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+
+.bmu-empty .bmu-spinner {
+  width: 32px;
+  height: 32px;
+  border-color: rgba(107, 0, 153, 0.2);
+  border-top-color: #6B0099;
+  margin: 0;
+}
+
+@keyframes bmu-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Footer note ─────────────────────────────────────────────────────────── */
+.bmu-footer-note {
+  margin-top: 24px;
+  padding: 14px 16px;
+  background: var(--hover-bg);
+  border: 1px solid var(--divider);
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+/* ── Modal overlay ───────────────────────────────────────────────────────── */
+.bmu-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+  padding: 0 0 0 0;
+}
+
+.bmu-modal {
+  background: var(--card-bg);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 600px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: bmu-slide-up 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.bmu-modal-confirm {
+  border-radius: 20px;
+  max-width: 380px;
+  margin: auto;
+}
+
+@keyframes bmu-slide-up {
+  from { transform: translateY(60px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+/* ── Modal header ────────────────────────────────────────────────────────── */
+.bmu-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 20px 14px;
+  border-bottom: 1px solid var(--divider);
+  flex-shrink: 0;
+}
+
+.bmu-modal-header-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.bmu-modal-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.bmu-modal-sub {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+/* ── Confirm modal specifics ─────────────────────────────────────────────── */
+.bmu-confirm-icon {
+  font-size: 2.6rem;
+  text-align: center;
+  padding: 24px 0 8px;
+}
+
+.bmu-confirm-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  text-align: center;
+  padding: 0 20px;
+}
+
+.bmu-confirm-message {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 10px 24px 0;
+  line-height: 1.55;
+}
+
+/* ── Scrollable form area ────────────────────────────────────────────────── */
+.bmu-form-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Form fields ─────────────────────────────────────────────────────────── */
+.bmu-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bmu-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bmu-required {
+  color: #c0392b;
+  margin-left: 2px;
+}
+
+.bmu-optional {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
+.bmu-input {
+  border: 1.5px solid var(--divider);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  color: var(--text-primary);
+  background: var(--bg-main);
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+  font-family: inherit;
+}
+
+.bmu-input:focus {
+  border-color: #9b30e0;
+}
+
+.bmu-input.error {
+  border-color: #c0392b;
+}
+
+.bmu-field-error {
+  font-size: 0.8rem;
+  color: #c0392b;
+  padding-left: 2px;
+}
+
+.bmu-field-hint {
+  font-size: 0.8rem;
+  color: #9b30e0;
+  padding-left: 2px;
+}
+
+/* Password row */
+.bmu-pwd-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bmu-pwd-input {
+  flex: 1;
+}
+
+.bmu-pwd-toggle {
+  background: var(--hover-bg);
+  border: 1.5px solid var(--divider);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  color: var(--text-secondary);
+}
+
+/* Info note */
+.bmu-info-note {
+  background: var(--hover-bg);
+  border: 1px solid var(--divider);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Save error */
+.bmu-save-error {
+  background: #fdeaea;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: #c0392b;
+  line-height: 1.4;
+}
+
+.bm-app.theme-dark .bmu-save-error {
+  background: #3d1a1a;
+  color: #e88080;
+}
+
+/* ── Modal footer (buttons) ──────────────────────────────────────────────── */
+.bmu-modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--divider);
+  flex-shrink: 0;
+}
+
+/* Buttons */
+.bmu-btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #6B0099, #4A0080);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.15s;
+}
+
+.bmu-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.bmu-btn-danger {
+  flex: 1;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.bmu-btn-danger:hover {
+  opacity: 0.9;
+}
+
+.bmu-btn-ghost {
+  flex: 1;
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1.5px solid var(--divider);
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.bmu-btn-ghost:hover {
+  background: var(--hover-bg);
+}
+
+.bmu-btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
