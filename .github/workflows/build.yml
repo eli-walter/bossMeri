@@ -43,12 +43,18 @@ jobs:
     - name: Sync Capacitor with Android
       run: npx cap sync android
 
-    - name: Generate Android icons and splash from assets
+    - name: Prepare assets folder for @capacitor/assets
+      run: |
+        mkdir -p assets
+        cp public/assets/icon.png assets/icon-only.png
+        cp public/assets/splash.png assets/splash.png
+
+    - name: Generate Android icons and splash
       run: |
         npm install -g @capacitor/assets
-        npx capacitor-assets generate --android \
-          --iconPath public/assets/icon.png \
-          --splashPath public/assets/splash.png \
+        npx @capacitor/assets generate --android \
+          --iconBackgroundColor '#ffffff' \
+          --splashBackgroundColor '#4A0080' \
           --androidProject android
 
     - name: Make gradlew executable
