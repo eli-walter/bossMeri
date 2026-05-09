@@ -12,6 +12,7 @@ import Login from './components/Login';
 import TopBar from './components/TopBar';
 import Dashboard from './components/Dashboard';
 import Settings from './components/Settings';
+import Users from './components/Users';
 import PlaceholderScreen from './components/PlaceholderScreen';
 import './App.css';
 
@@ -63,18 +64,17 @@ function App() {
     const isDark = settings.theme === 'dark';
 
     root.style.setProperty('--font-size-base', settings.fontSize);
-    root.style.setProperty('--bg-main',       isDark ? '#121212'   : '#f4f6f9');
-    root.style.setProperty('--card-bg',       isDark ? '#1e1e1e'   : '#ffffff');
-    root.style.setProperty('--text-primary',  isDark ? '#f0f0f0'   : '#1a1a2e');
-    root.style.setProperty('--text-secondary',isDark ? '#aaaaaa'   : '#666666');
-    root.style.setProperty('--divider',       isDark ? '#333333'   : '#eeeeee');
-    root.style.setProperty('--hover-bg',      isDark ? '#2a2a2a'   : '#faf8ff');
-    root.style.setProperty('--active-bg',     isDark ? '#2d1a40'   : '#f0e6ff');
+    root.style.setProperty('--bg-main',        isDark ? '#121212'  : '#f4f6f9');
+    root.style.setProperty('--card-bg',        isDark ? '#1e1e1e'  : '#ffffff');
+    root.style.setProperty('--text-primary',   isDark ? '#f0f0f0'  : '#1a1a2e');
+    root.style.setProperty('--text-secondary', isDark ? '#aaaaaa'  : '#666666');
+    root.style.setProperty('--divider',        isDark ? '#333333'  : '#eeeeee');
+    root.style.setProperty('--hover-bg',       isDark ? '#2a2a2a'  : '#faf8ff');
+    root.style.setProperty('--active-bg',      isDark ? '#2d1a40'  : '#f0e6ff');
 
     document.body.style.background = isDark ? '#121212' : '#f4f6f9';
     document.body.style.fontSize   = settings.fontSize;
 
-    // Save to localStorage
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   }, [settings]);
 
@@ -159,6 +159,7 @@ function App() {
   const renderScreen = () => {
     switch (activeScreen) {
       case 'dashboard': return <Dashboard onNavigate={handleNavigate} />;
+      case 'users':     return <Users />;
       case 'settings':  return <Settings settings={settings} onSettingsChange={handleSettingsChange} />;
       default:          return <PlaceholderScreen screen={activeScreen} />;
     }
