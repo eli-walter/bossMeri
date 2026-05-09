@@ -52,7 +52,7 @@ jobs:
         mkdir -p assets
         cp public/assets/icon.png assets/icon-only.png
         cp public/assets/icon.png assets/icon-foreground.png
-        convert -size 1024x1024 xc:none assets/icon-background.png
+        convert -size 1024x1024 xc:white assets/icon-background.png
         cp public/assets/splash.png assets/splash.png
 
     - name: Generate Android icons and splash
