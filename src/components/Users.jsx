@@ -7,21 +7,16 @@ import {
   signOut as secondarySignOut,
 } from 'firebase/auth';
 import {
-  collection,
-  doc,
-  setDoc,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  query,
-  orderBy,
-  serverTimestamp,
+  collection, doc, setDoc, getDocs, updateDoc, deleteDoc,
+  query, orderBy, serverTimestamp,
 } from 'firebase/firestore';
 import { db, firebaseConfig } from '../firebase';
 import './Users.css';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-const toEmail = (email) => email.trim().toLowerCase();
+// Kaon Lo Eli's login converts a plain username → username@kaon.app
+// So we must create Firebase Auth accounts in that same format.
+const toLoginEmail = (username) => `${username.trim().toLowerCase()}@kaon.app`;
 
 const getInitials = (name) => {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -30,15 +25,13 @@ const getInitials = (name) => {
 };
 
 const AVATAR_COLORS = [
-  '#4A0080', '#6B0099', '#8B0000', '#B8860B',
-  '#005f73', '#0a9396', '#ae2012', '#ca6702',
+  '#4A0080','#6B0099','#8B0000','#B8860B',
+  '#005f73','#0a9396','#ae2012','#ca6702',
 ];
-const pickColor = (uid) => AVATAR_COLORS[(uid.charCodeAt(0) + uid.charCodeAt(uid.length - 1)) % AVATAR_COLORS.length];
+const pickColor = (uid) =>
+  AVATAR_COLORS[(uid.charCodeAt(0) + uid.charCodeAt(uid.length - 1)) % AVATAR_COLORS.length];
 
-const toWaLink = (number) => {
-  const digits = number.replace(/[^\d]/g, '');
-  return `https://wa.me/${digits}`;
-};
+const toWaLink = (n) => `https://wa.me/${n.replace(/[^\d]/g, '')}`;
 
 const formatDate = (ts) => {
   if (!ts) return '—';
@@ -46,26 +39,25 @@ const formatDate = (ts) => {
   return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 };
 
-// ─── Secondary Firebase Auth (creates users without signing admin out) ────────
 const getSecondaryAuth = () => {
-  const APP_NAME = 'kaon-user-auth';
-  const existing = getApps().find((a) => a.name === APP_NAME);
-  const app = existing || initializeApp(firebaseConfig, APP_NAME);
+  const NAME = 'kaon-user-auth';
+  const existing = getApps().find((a) => a.name === NAME);
+  const app = existing || initializeApp(firebaseConfig, NAME);
   return getAuth(app);
 };
 
 // ─── Validators ───────────────────────────────────────────────────────────────
-const validateAdd = ({ loginEmail, fullName, whatsapp, password, confirmPassword }) => {
+const validateAdd = ({ username, fullName, whatsapp, password, confirmPassword }) => {
   const e = {};
-  if (!loginEmail.trim())
-    e.loginEmail = 'Email is required.';
-  else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginEmail.trim()))
-    e.loginEmail = 'Enter a valid email address (e.g. ana@gmail.com).';
+  if (!username.trim())
+    e.username = 'Username is required.';
+  else if (!/^[a-zA-Z0-9._-]{3,30}$/.test(username.trim()))
+    e.username = 'Use 3–30 letters, numbers, dots, underscores, or hyphens.';
   if (!fullName.trim())
     e.fullName = 'Full name is required.';
   if (!whatsapp.trim())
     e.whatsapp = 'WhatsApp number is required.';
-  else if (!/^\+?[\d\s\-()]{7,20}$/.test(whatsapp.trim()))
+  else if (!/^\+?[\d\s\-()\d]{7,20}$/.test(whatsapp.trim()))
     e.whatsapp = 'Enter a valid phone number (e.g. +677 12345).';
   if (!password)
     e.password = 'Password is required.';
@@ -81,28 +73,24 @@ const validateEdit = ({ fullName, whatsapp }) => {
   if (!fullName.trim()) e.fullName = 'Full name is required.';
   if (!whatsapp.trim())
     e.whatsapp = 'WhatsApp number is required.';
-  else if (!/^\+?[\d\s\-()]{7,20}$/.test(whatsapp.trim()))
+  else if (!/^\+?[\d\s\-()\d]{7,20}$/.test(whatsapp.trim()))
     e.whatsapp = 'Enter a valid phone number (e.g. +677 12345).';
   return e;
 };
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
-
-const FieldError = ({ msg }) =>
-  msg ? <div className="bmu-field-error">{msg}</div> : null;
-
+const FieldError = ({ msg }) => msg ? <div className="bmu-field-error">{msg}</div> : null;
 const Spinner = () => <div className="bmu-spinner" />;
 
-/** Modal backdrop wrapper */
 const Modal = ({ onClose, children }) => (
   <div className="bmu-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
     <div className="bmu-modal">{children}</div>
   </div>
 );
 
-/** Add User Modal */
+/** Add User Modal — uses username, not email, matching Kaon Lo Eli's login */
 const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
-  const EMPTY = { loginEmail: '', fullName: '', whatsapp: '', password: '', confirmPassword: '' };
+  const EMPTY = { username: '', fullName: '', whatsapp: '', password: '', confirmPassword: '' };
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [showPwd, setShowPwd] = useState(false);
@@ -122,24 +110,29 @@ const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
         <span className="bmu-modal-header-icon">👤</span>
         <div>
           <div className="bmu-modal-title">Add New User</div>
-          <div className="bmu-modal-sub">Creates a login account for Kaon Lo Elizabeth</div>
+          <div className="bmu-modal-sub">Creates a login for the Kaon Lo Elizabeth app</div>
         </div>
       </div>
 
       <div className="bmu-form-scroll">
-        {/* Login Email */}
+        {/* Username */}
         <div className="bmu-field">
-          <label className="bmu-label">Email <span className="bmu-required">*</span></label>
+          <label className="bmu-label">Username <span className="bmu-required">*</span></label>
           <input
-            className={`bmu-input ${errors.loginEmail ? 'error' : ''}`}
-            value={form.loginEmail}
-            onChange={set('loginEmail')}
-            placeholder="e.g. ana@gmail.com"
-            type="email"
+            className={`bmu-input ${errors.username ? 'error' : ''}`}
+            value={form.username}
+            onChange={set('username')}
+            placeholder="e.g. ana_napo"
             autoCapitalize="none"
             autoCorrect="off"
+            spellCheck="false"
           />
-          <FieldError msg={errors.loginEmail} />
+          {form.username.trim().length > 0 && (
+            <div className="bmu-field-hint">
+              Login email: {toLoginEmail(form.username)}
+            </div>
+          )}
+          <FieldError msg={errors.username} />
         </div>
 
         {/* Full Name */}
@@ -179,11 +172,10 @@ const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
               placeholder="Min. 6 characters"
               autoComplete="new-password"
             />
-            <button
-              type="button"
-              className="bmu-pwd-toggle"
-              onClick={() => setShowPwd((v) => !v)}
-            >{showPwd ? '🙈' : '👁️'}</button>
+            <button type="button" className="bmu-pwd-toggle"
+              onClick={() => setShowPwd((v) => !v)}>
+              {showPwd ? '🙈' : '👁️'}
+            </button>
           </div>
           <FieldError msg={errors.password} />
         </div>
@@ -206,9 +198,7 @@ const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
       </div>
 
       <div className="bmu-modal-footer">
-        <button className="bmu-btn-ghost" onClick={onClose} disabled={saving}>
-          Cancel
-        </button>
+        <button className="bmu-btn-ghost" onClick={onClose} disabled={saving}>Cancel</button>
         <button className="bmu-btn-primary" onClick={handleSubmit} disabled={saving}>
           {saving ? <><Spinner /> Creating…</> : 'Create User'}
         </button>
@@ -219,12 +209,8 @@ const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
 
 /** Edit User Modal */
 const EditUserModal = ({ user, onClose, onSave, saving, saveError }) => {
-  const [form, setForm] = useState({
-    fullName: user.fullName || '',
-    whatsapp: user.whatsapp || '',
-  });
+  const [form, setForm] = useState({ fullName: user.fullName || '', whatsapp: user.whatsapp || '' });
   const [errors, setErrors] = useState({});
-
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
   const handleSubmit = () => {
@@ -237,44 +223,31 @@ const EditUserModal = ({ user, onClose, onSave, saving, saveError }) => {
   return (
     <Modal onClose={onClose}>
       <div className="bmu-modal-header">
-        <div
-          className="bmu-avatar bmu-avatar-lg"
-          style={{ background: pickColor(user.uid) }}
-        >
+        <div className="bmu-avatar bmu-avatar-lg" style={{ background: pickColor(user.uid) }}>
           {getInitials(user.fullName)}
         </div>
         <div>
           <div className="bmu-modal-title">Edit User</div>
-          <div className="bmu-modal-sub">{user.loginEmail}</div>
+          <div className="bmu-modal-sub">@{user.username || user.loginEmail}</div>
         </div>
       </div>
 
       <div className="bmu-form-scroll">
         <div className="bmu-field">
           <label className="bmu-label">Full Name <span className="bmu-required">*</span></label>
-          <input
-            className={`bmu-input ${errors.fullName ? 'error' : ''}`}
-            value={form.fullName}
-            onChange={set('fullName')}
-          />
+          <input className={`bmu-input ${errors.fullName ? 'error' : ''}`}
+            value={form.fullName} onChange={set('fullName')} />
           <FieldError msg={errors.fullName} />
         </div>
-
         <div className="bmu-field">
           <label className="bmu-label">WhatsApp Number <span className="bmu-required">*</span></label>
-          <input
-            className={`bmu-input ${errors.whatsapp ? 'error' : ''}`}
-            value={form.whatsapp}
-            onChange={set('whatsapp')}
-            type="tel"
-          />
+          <input className={`bmu-input ${errors.whatsapp ? 'error' : ''}`}
+            value={form.whatsapp} onChange={set('whatsapp')} type="tel" />
           <FieldError msg={errors.whatsapp} />
         </div>
-
         <div className="bmu-info-note">
-          🔒 Email and password can only be changed via the Firebase Console.
+          🔒 Username and password can only be changed via the Firebase Console.
         </div>
-
         {saveError && <div className="bmu-save-error">⚠️ {saveError}</div>}
       </div>
 
@@ -288,7 +261,7 @@ const EditUserModal = ({ user, onClose, onSave, saving, saveError }) => {
   );
 };
 
-/** Confirm action modal */
+/** Confirm modal */
 const ConfirmModal = ({ icon, title, message, confirmLabel, danger, onConfirm, onCancel }) => (
   <div className="bmu-overlay">
     <div className="bmu-modal bmu-modal-confirm">
@@ -297,10 +270,7 @@ const ConfirmModal = ({ icon, title, message, confirmLabel, danger, onConfirm, o
       <div className="bmu-confirm-message">{message}</div>
       <div className="bmu-modal-footer">
         <button className="bmu-btn-ghost" onClick={onCancel}>Cancel</button>
-        <button
-          className={danger ? 'bmu-btn-danger' : 'bmu-btn-primary'}
-          onClick={onConfirm}
-        >
+        <button className={danger ? 'bmu-btn-danger' : 'bmu-btn-primary'} onClick={onConfirm}>
           {confirmLabel}
         </button>
       </div>
@@ -308,79 +278,102 @@ const ConfirmModal = ({ icon, title, message, confirmLabel, danger, onConfirm, o
   </div>
 );
 
-/** Single user card */
-const UserCard = ({ user, onEdit, onToggleActive, onDelete }) => {
-  const initials = getInitials(user.fullName);
+/** User profile modal — shown when a name is tapped in the list */
+const UserProfileModal = ({ user, onClose, onEdit, onToggleActive, onDelete }) => {
   const color = pickColor(user.uid);
-
   return (
-    <div className={`bmu-card ${user.active ? '' : 'bmu-card-disabled'}`}>
-      <div className="bmu-card-top">
-        <div className="bmu-avatar" style={{ background: color }}>{initials}</div>
-
-        <div className="bmu-card-info">
-          <div className="bmu-card-name">{user.fullName}</div>
-          <div className="bmu-card-username">✉️ {user.loginEmail}</div>
+    <Modal onClose={onClose}>
+      <div className="bmu-modal-header bmu-profile-header">
+        <div className="bmu-avatar bmu-avatar-lg" style={{ background: color }}>
+          {getInitials(user.fullName)}
         </div>
-
-        <div className={`bmu-badge ${user.active ? 'bmu-badge-active' : 'bmu-badge-disabled'}`}>
-          {user.active ? 'Active' : 'Disabled'}
+        <div className="bmu-profile-header-info">
+          <div className="bmu-modal-title">{user.fullName}</div>
+          <div className="bmu-modal-sub">@{user.username || user.loginEmail?.replace('@kaon.app','')}</div>
+          <span className={`bmu-badge ${user.active ? 'bmu-badge-active' : 'bmu-badge-disabled'}`}>
+            {user.active ? 'Active' : 'Disabled'}
+          </span>
         </div>
       </div>
 
-      <div className="bmu-card-meta">
-        <a
-          className="bmu-wa-link"
-          href={toWaLink(user.whatsapp)}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span className="bmu-wa-icon">📱</span>
-          {user.whatsapp}
-        </a>
-        {user.createdAt && (
-          <div className="bmu-card-date">Added {formatDate(user.createdAt)}</div>
-        )}
+      <div className="bmu-form-scroll bmu-profile-body">
+        <div className="bmu-profile-row">
+          <span className="bmu-profile-label">📱 WhatsApp</span>
+          <a className="bmu-wa-link" href={toWaLink(user.whatsapp)}
+            target="_blank" rel="noopener noreferrer">
+            {user.whatsapp}
+          </a>
+        </div>
+        <div className="bmu-profile-row">
+          <span className="bmu-profile-label">🔑 Login</span>
+          <span className="bmu-profile-value">{user.loginEmail || `${user.username}@kaon.app`}</span>
+        </div>
+        <div className="bmu-profile-row">
+          <span className="bmu-profile-label">📅 Added</span>
+          <span className="bmu-profile-value">{formatDate(user.createdAt)}</span>
+        </div>
       </div>
 
-      <div className="bmu-card-actions">
-        <button className="bmu-action-btn bmu-action-edit" onClick={() => onEdit(user)}>
+      <div className="bmu-profile-actions">
+        <button className="bmu-action-btn bmu-action-edit bmu-profile-action-btn"
+          onClick={() => { onEdit(user); onClose(); }}>
           ✏️ Edit
         </button>
         <button
-          className={`bmu-action-btn ${user.active ? 'bmu-action-disable' : 'bmu-action-enable'}`}
-          onClick={() => onToggleActive(user)}
-        >
+          className={`bmu-action-btn bmu-profile-action-btn ${user.active ? 'bmu-action-disable' : 'bmu-action-enable'}`}
+          onClick={() => { onToggleActive(user); onClose(); }}>
           {user.active ? '🚫 Disable' : '✅ Enable'}
         </button>
-        <button className="bmu-action-btn bmu-action-delete" onClick={() => onDelete(user)}>
-          🗑️
+        <button className="bmu-action-btn bmu-action-delete bmu-profile-action-btn"
+          onClick={() => { onDelete(user); onClose(); }}>
+          🗑️ Delete
         </button>
       </div>
-    </div>
+
+      <div className="bmu-modal-footer">
+        <button className="bmu-btn-ghost" style={{flex:'none', width:'100%'}} onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </Modal>
   );
 };
 
+/** Simple name-row — shown in the list (no card) */
+const UserListItem = ({ user, onClick }) => (
+  <div
+    className={`bmu-list-item ${!user.active ? 'bmu-list-item-disabled' : ''}`}
+    onClick={() => onClick(user)}
+  >
+    <div className="bmu-avatar bmu-avatar-sm" style={{ background: pickColor(user.uid) }}>
+      {getInitials(user.fullName)}
+    </div>
+    <div className="bmu-list-name">{user.fullName}</div>
+    <div className={`bmu-badge ${user.active ? 'bmu-badge-active' : 'bmu-badge-disabled'}`}>
+      {user.active ? 'Active' : 'Off'}
+    </div>
+    <span className="bmu-list-chevron">›</span>
+  </div>
+);
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Users = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers]         = useState([]);
+  const [loading, setLoading]     = useState(true);
   const [fetchError, setFetchError] = useState('');
-  const [search, setSearch] = useState('');
+  const [search, setSearch]       = useState('');
 
-  // Modal state
-  const [showAdd, setShowAdd] = useState(false);
-  const [editTarget, setEditTarget] = useState(null);
+  const [showAdd, setShowAdd]         = useState(false);
+  const [profileTarget, setProfileTarget] = useState(null); // name-click → profile modal
+  const [editTarget, setEditTarget]   = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [toggleTarget, setToggleTarget] = useState(null);
 
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving]       = useState(false);
   const [saveError, setSaveError] = useState('');
 
-  // ── Fetch users ────────────────────────────────────────────────────────────
   const fetchUsers = useCallback(async () => {
-    setLoading(true);
-    setFetchError('');
+    setLoading(true); setFetchError('');
     try {
       const q = query(collection(db, 'users'), orderBy('createdAt', 'asc'));
       const snap = await getDocs(q);
@@ -388,33 +381,25 @@ const Users = () => {
     } catch (err) {
       console.error('Failed to load users:', err);
       setFetchError('Could not load users. Check your connection and try again.');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
-  // ── Add user ───────────────────────────────────────────────────────────────
-  const handleAddSave = async ({ loginEmail, fullName, whatsapp, password }) => {
-    setSaving(true);
-    setSaveError('');
+  // ── Add user — creates Firebase Auth with username@kaon.app format ─────────
+  const handleAddSave = async ({ username, fullName, whatsapp, password }) => {
+    setSaving(true); setSaveError('');
+    const loginEmail = toLoginEmail(username);
     try {
       const secondaryAuth = getSecondaryAuth();
-      const credential = await createUserWithEmailAndPassword(
-        secondaryAuth,
-        toEmail(loginEmail),
-        password
-      );
+      const credential = await createUserWithEmailAndPassword(secondaryAuth, loginEmail, password);
       const { uid } = credential.user;
-
-      // Sign secondary user out immediately — we don't need that session
       await secondarySignOut(secondaryAuth);
 
-      // Save profile to Firestore
       await setDoc(doc(db, 'users', uid), {
         uid,
-        loginEmail: toEmail(loginEmail),
+        username: username.trim().toLowerCase(),
+        loginEmail,
         fullName: fullName.trim(),
         whatsapp: whatsapp.trim(),
         active: true,
@@ -425,22 +410,17 @@ const Users = () => {
       await fetchUsers();
     } catch (err) {
       console.error('Add user error:', err);
-      if (err.code === 'auth/email-already-in-use') {
-        setSaveError(`An account with "${toEmail(loginEmail)}" already exists.`);
-      } else if (err.code === 'auth/weak-password') {
+      if (err.code === 'auth/email-already-in-use')
+        setSaveError(`Username "${username.trim().toLowerCase()}" is already taken.`);
+      else if (err.code === 'auth/weak-password')
         setSaveError('Password is too weak. Use at least 6 characters.');
-      } else {
+      else
         setSaveError('Failed to create user. Please try again.');
-      }
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
-  // ── Edit user ──────────────────────────────────────────────────────────────
   const handleEditSave = async ({ fullName, whatsapp }) => {
-    setSaving(true);
-    setSaveError('');
+    setSaving(true); setSaveError('');
     try {
       await updateDoc(doc(db, 'users', editTarget.uid), {
         fullName: fullName.trim(),
@@ -451,41 +431,31 @@ const Users = () => {
     } catch (err) {
       console.error('Edit user error:', err);
       setSaveError('Failed to save changes. Please try again.');
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   };
 
-  // ── Toggle active ──────────────────────────────────────────────────────────
   const handleToggleConfirm = async () => {
-    const u = toggleTarget;
-    setToggleTarget(null);
+    const u = toggleTarget; setToggleTarget(null);
     try {
       await updateDoc(doc(db, 'users', u.uid), { active: !u.active });
       await fetchUsers();
-    } catch (err) {
-      console.error('Toggle error:', err);
-    }
+    } catch (err) { console.error('Toggle error:', err); }
   };
 
-  // ── Delete user ────────────────────────────────────────────────────────────
   const handleDeleteConfirm = async () => {
-    const u = deleteTarget;
-    setDeleteTarget(null);
+    const u = deleteTarget; setDeleteTarget(null);
     try {
       await deleteDoc(doc(db, 'users', u.uid));
       await fetchUsers();
-    } catch (err) {
-      console.error('Delete error:', err);
-    }
+    } catch (err) { console.error('Delete error:', err); }
   };
 
-  // ── Search filter ──────────────────────────────────────────────────────────
   const filtered = users.filter((u) => {
     const q = search.trim().toLowerCase();
     if (!q) return true;
     return (
       u.fullName?.toLowerCase().includes(q) ||
+      u.username?.toLowerCase().includes(q) ||
       u.loginEmail?.toLowerCase().includes(q) ||
       u.whatsapp?.includes(q)
     );
@@ -493,10 +463,8 @@ const Users = () => {
 
   const activeCount = users.filter((u) => u.active).length;
 
-  // ── Render ─────────────────────────────────────────────────────────────────
   return (
     <div className="bmu-screen">
-
       {/* Header */}
       <div className="bmu-header">
         <div className="bmu-header-left">
@@ -517,50 +485,37 @@ const Users = () => {
       {!loading && users.length > 0 && (
         <div className="bmu-search-row">
           <span className="bmu-search-icon">🔍</span>
-          <input
-            className="bmu-search"
-            value={search}
+          <input className="bmu-search" value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name, email, or number…"
-          />
-          {search && (
-            <button className="bmu-search-clear" onClick={() => setSearch('')}>✕</button>
-          )}
+            placeholder="Search by name or username…" />
+          {search && <button className="bmu-search-clear" onClick={() => setSearch('')}>✕</button>}
         </div>
       )}
 
       {/* Body */}
       <div className="bmu-body">
         {loading && (
-          <div className="bmu-empty">
-            <Spinner />
-            <div className="bmu-empty-text">Loading users…</div>
-          </div>
+          <div className="bmu-empty"><Spinner /><div className="bmu-empty-text">Loading users…</div></div>
         )}
-
         {!loading && fetchError && (
           <div className="bmu-empty">
             <div className="bmu-empty-icon">⚠️</div>
             <div className="bmu-empty-text">{fetchError}</div>
-            <button className="bmu-btn-primary bmu-retry-btn" onClick={fetchUsers}>
-              Try Again
-            </button>
+            <button className="bmu-btn-primary bmu-retry-btn" onClick={fetchUsers}>Try Again</button>
           </div>
         )}
-
         {!loading && !fetchError && users.length === 0 && (
           <div className="bmu-empty">
             <div className="bmu-empty-icon">👥</div>
             <div className="bmu-empty-title">No Users Yet</div>
             <div className="bmu-empty-text">
-              Add users here so they can log in to the Kaon Lo Elizabeth app.
+              Add users here so they can log in to the Kaon Lo Elizabeth app with their username and password.
             </div>
             <button className="bmu-btn-primary" onClick={() => { setSaveError(''); setShowAdd(true); }}>
               + Add First User
             </button>
           </div>
         )}
-
         {!loading && !fetchError && users.length > 0 && filtered.length === 0 && (
           <div className="bmu-empty">
             <div className="bmu-empty-icon">🔍</div>
@@ -569,43 +524,41 @@ const Users = () => {
           </div>
         )}
 
-        {!loading && !fetchError && filtered.map((user) => (
-          <UserCard
-            key={user.uid}
-            user={user}
-            onEdit={(u) => { setSaveError(''); setEditTarget(u); }}
-            onToggleActive={(u) => setToggleTarget(u)}
-            onDelete={(u) => setDeleteTarget(u)}
-          />
-        ))}
+        {/* Name-only list */}
+        {!loading && !fetchError && filtered.length > 0 && (
+          <div className="bmu-list-container">
+            {filtered.map((u) => (
+              <UserListItem key={u.uid} user={u} onClick={setProfileTarget} />
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Note at bottom */}
       {!loading && !fetchError && users.length > 0 && (
         <div className="bmu-footer-note">
-          🔒 To reset a password, use the Firebase Console → Authentication.
-          Deleting a user here removes their profile but not their login account.
+          🔒 Tap a name to view profile. Password resets must be done via the Firebase Console.
         </div>
       )}
 
       {/* ── Modals ── */}
       {showAdd && (
-        <AddUserModal
-          onClose={() => setShowAdd(false)}
-          onSave={handleAddSave}
-          saving={saving}
-          saveError={saveError}
+        <AddUserModal onClose={() => setShowAdd(false)}
+          onSave={handleAddSave} saving={saving} saveError={saveError} />
+      )}
+
+      {profileTarget && (
+        <UserProfileModal
+          user={profileTarget}
+          onClose={() => setProfileTarget(null)}
+          onEdit={(u) => { setSaveError(''); setEditTarget(u); }}
+          onToggleActive={(u) => setToggleTarget(u)}
+          onDelete={(u) => setDeleteTarget(u)}
         />
       )}
 
       {editTarget && (
-        <EditUserModal
-          user={editTarget}
-          onClose={() => setEditTarget(null)}
-          onSave={handleEditSave}
-          saving={saving}
-          saveError={saveError}
-        />
+        <EditUserModal user={editTarget} onClose={() => setEditTarget(null)}
+          onSave={handleEditSave} saving={saving} saveError={saveError} />
       )}
 
       {toggleTarget && (
@@ -614,7 +567,7 @@ const Users = () => {
           title={toggleTarget.active ? 'Disable User?' : 'Enable User?'}
           message={
             toggleTarget.active
-              ? `${toggleTarget.fullName} will be marked as disabled. Note: they can still log in until you also remove their account from Firebase Console.`
+              ? `${toggleTarget.fullName} will be marked as disabled.`
               : `${toggleTarget.fullName} will be marked as active again.`
           }
           confirmLabel={toggleTarget.active ? 'Disable' : 'Enable'}
@@ -626,11 +579,9 @@ const Users = () => {
 
       {deleteTarget && (
         <ConfirmModal
-          icon="🗑️"
-          title="Delete User?"
-          message={`This will remove ${deleteTarget.fullName}'s profile from the app. Their Firebase login account will remain — delete it from Firebase Console if needed.`}
-          confirmLabel="Delete"
-          danger
+          icon="🗑️" title="Delete User?"
+          message={`This will remove ${deleteTarget.fullName}'s profile. Their Firebase login will remain — delete it from Firebase Console if needed.`}
+          confirmLabel="Delete" danger
           onConfirm={handleDeleteConfirm}
           onCancel={() => setDeleteTarget(null)}
         />

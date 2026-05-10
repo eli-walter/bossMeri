@@ -668,3 +668,120 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* ── Name-only list ──────────────────────────────────────────────────────── */
+.bmu-list-container {
+  background: var(--card-bg);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+}
+
+.bmu-list-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--divider);
+  transition: background 0.15s;
+}
+
+.bmu-list-item:last-child { border-bottom: none; }
+.bmu-list-item:active     { background: var(--hover-bg); }
+
+.bmu-list-item-disabled { opacity: 0.55; }
+
+.bmu-avatar-sm {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.bmu-list-name {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bmu-list-chevron {
+  font-size: 1.4rem;
+  color: var(--text-secondary);
+  opacity: 0.4;
+  margin-left: 4px;
+}
+
+/* ── Profile modal ───────────────────────────────────────────────────────── */
+.bmu-profile-header {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 20px 16px;
+  gap: 10px;
+}
+
+.bmu-profile-header-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.bmu-profile-body {
+  gap: 0 !important;
+  padding: 0 !important;
+}
+
+.bmu-profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--divider);
+  gap: 12px;
+}
+
+.bmu-profile-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.bmu-profile-value {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  text-align: right;
+  word-break: break-all;
+}
+
+.bmu-profile-actions {
+  display: flex;
+  gap: 8px;
+  padding: 16px 20px 0;
+}
+
+.bmu-profile-action-btn {
+  flex: 1;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: opacity 0.15s;
+}
+
+.bmu-profile-action-btn:active { opacity: 0.75; }

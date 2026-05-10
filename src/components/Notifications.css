@@ -1,0 +1,118 @@
+/* src/components/Notifications.css */
+
+.notif-screen {
+  padding: 24px 16px 60px;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Header ── */
+.notif-header {
+  display: flex; align-items: center;
+  justify-content: space-between; margin-bottom: 16px;
+}
+.notif-header-left { display: flex; align-items: center; gap: 14px; }
+.notif-header-icon  { font-size: 2rem; line-height: 1; }
+.notif-header-title { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); }
+.notif-header-sub   { font-size: 0.85rem; color: var(--text-secondary); margin-top: 2px; }
+
+.notif-refresh-btn {
+  background: var(--card-bg); border: 1.5px solid var(--divider);
+  border-radius: 12px; padding: 8px 12px; font-size: 1.1rem;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.notif-refresh-btn:disabled { opacity: 0.5; }
+
+/* ── Filter tabs ── */
+.notif-filter-row {
+  display: flex; gap: 8px; margin-bottom: 16px;
+  overflow-x: auto; padding-bottom: 2px;
+}
+.notif-filter-row::-webkit-scrollbar { display: none; }
+
+.notif-filter-btn {
+  background: var(--card-bg); border: 1.5px solid var(--divider);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 0.82rem; font-weight: 600; color: var(--text-secondary);
+  cursor: pointer; white-space: nowrap; transition: all 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.notif-filter-btn.active {
+  background: var(--active-bg); border-color: #9b30e0; color: #6B0099;
+}
+
+.notif-badge {
+  background: #c0392b; color: #fff;
+  border-radius: 20px; padding: 1px 6px;
+  font-size: 0.7rem; font-weight: 800;
+}
+
+/* ── Body ── */
+.notif-body { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── Notification card ── */
+.notif-card {
+  display: flex; align-items: flex-start; gap: 12px;
+  background: var(--card-bg);
+  border-radius: 16px; padding: 14px 14px;
+  border-left: 4px solid var(--divider);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Colour variants */
+.notif-critical { border-left-color: #c0392b; background: #fef9f9; }
+.notif-warning  { border-left-color: #e67e22; background: #fffbf5; }
+.notif-success  { border-left-color: #27ae60; background: #f5fef8; }
+.notif-info     { border-left-color: #6B0099; background: #faf5ff; }
+.notif-muted    { border-left-color: #999999; }
+
+/* Dark theme overrides */
+.bm-app.theme-dark .notif-critical { background: #2a1010; }
+.bm-app.theme-dark .notif-warning  { background: #2a1e10; }
+.bm-app.theme-dark .notif-success  { background: #10251a; }
+.bm-app.theme-dark .notif-info     { background: #1e1028; }
+
+.notif-icon    { font-size: 1.5rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.notif-content { flex: 1; min-width: 0; }
+.notif-title   { font-size: 0.9rem; font-weight: 800; color: var(--text-primary); margin-bottom: 3px; }
+.notif-body    { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+
+.notif-time {
+  font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap;
+  flex-shrink: 0; margin-top: 2px;
+}
+
+/* ── Empty states ── */
+.notif-empty {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; padding: 56px 24px; gap: 12px;
+}
+.notif-empty-icon  { font-size: 3rem; }
+.notif-empty-title { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+.notif-empty-text  { font-size: 0.9rem; color: var(--text-secondary); max-width: 280px; line-height: 1.5; }
+
+.notif-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid rgba(107,0,153,0.15);
+  border-top-color: #6B0099;
+  border-radius: 50%;
+  animation: notif-spin 0.7s linear infinite;
+}
+@keyframes notif-spin { to { transform: rotate(360deg); } }
+
+.notif-btn-primary {
+  background: linear-gradient(135deg, #6B0099, #4A0080);
+  color: #fff; border: none; border-radius: 12px;
+  padding: 12px 24px; font-size: 0.95rem; font-weight: 700;
+  cursor: pointer; margin-top: 4px;
+}
+
+/* ── Footer note ── */
+.notif-footer-note {
+  margin-top: 24px; padding: 14px 16px;
+  background: var(--hover-bg); border: 1px solid var(--divider);
+  border-radius: 12px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.55;
+}
