@@ -1,6 +1,7 @@
+// capacitor.config.json
 {
-  "appId": "com.meresimi.bossmeri",
-  "appName": "Boss Meri",
+  "appId": "com.meresimi.marketboss",
+  "appName": "Market Boss",
   "webDir": "build",
   "server": {
     "androidScheme": "https"
