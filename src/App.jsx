@@ -1,11 +1,12 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react';
-import { auth } from './firebase';
+import { auth, db } from './firebase';
 import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { App as CapApp } from '@capacitor/app';
 import SplashScreen      from './components/SplashScreen';
 import Login             from './components/Login';
@@ -45,6 +46,11 @@ function App() {
   const [showExitModal, setShowExitModal]     = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // Admin profile fetched from Firestore 'adminProfiles' collection.
+  // Each document is keyed by the admin's Firebase Auth UID and contains:
+  // { status: 'Mr'|'Ms'|'Mrs', fullName: string, email: string }
+  const [adminProfile, setAdminProfile] = useState(null);
+
   const [settings, setSettings] = useState(() => {
     try {
       const saved = localStorage.getItem(SETTINGS_KEY);
@@ -52,13 +58,12 @@ function App() {
     } catch { return DEFAULT_SETTINGS; }
   });
 
-  // Apply theme + font size. Crucially, set font-size on the <html> root element
-  // so that rem units in all child components scale instantly with the setting.
+  // Apply theme + font size
   useEffect(() => {
     const root = document.documentElement;
     const isDark = settings.theme === 'dark';
 
-    root.style.fontSize = settings.fontSize;            // makes 1rem = chosen size
+    root.style.fontSize = settings.fontSize;
     root.style.setProperty('--font-size-base', settings.fontSize);
     root.style.setProperty('--bg-main',        isDark ? '#121212' : '#f4f6f9');
     root.style.setProperty('--card-bg',        isDark ? '#1e1e1e' : '#ffffff');
@@ -74,8 +79,32 @@ function App() {
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
   }, [settings]);
 
+  // Listen for auth state and fetch admin profile on login
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => { setUser(u); setAuthReady(true); });
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      setUser(u);
+      setAuthReady(true);
+      if (u) {
+        try {
+          const profileSnap = await getDoc(doc(db, 'adminProfiles', u.uid));
+          if (profileSnap.exists()) {
+            setAdminProfile(profileSnap.data());
+          } else {
+            // Fallback: build a minimal profile from Firebase Auth data
+            setAdminProfile({
+              status: '',
+              fullName: u.displayName || u.email,
+              email: u.email,
+            });
+          }
+        } catch (err) {
+          console.error('Failed to load admin profile:', err);
+          setAdminProfile({ status: '', fullName: u.displayName || u.email, email: u.email });
+        }
+      } else {
+        setAdminProfile(null);
+      }
+    });
     return unsub;
   }, []);
 
@@ -119,7 +148,7 @@ function App() {
 
   const renderScreen = () => {
     switch (activeScreen) {
-      case 'dashboard':     return <Dashboard onNavigate={setActiveScreen} />;
+      case 'dashboard':     return <Dashboard onNavigate={setActiveScreen} adminProfile={adminProfile} />;
       case 'users':         return <Users />;
       case 'otaManKaon':    return <OtaManKaon />;
       case 'notifications': return <Notifications />;
@@ -128,25 +157,30 @@ function App() {
     }
   };
 
+  // Build display name for TopBar: "Mr. John" or fallback to email
+  const topBarName = adminProfile
+    ? [adminProfile.status, adminProfile.fullName?.split(' ')[0]].filter(Boolean).join(' ')
+    : (user.displayName || user.email);
+
   return (
     <div className={`bm-app theme-${settings.theme}`}>
       <TopBar
         activeScreen={activeScreen}
         onNavigate={setActiveScreen}
         onLogout={() => setShowLogoutModal(true)}
-        userName={user.displayName || user.email}
+        userName={topBarName}
       />
       <div className="bm-screen-content">{renderScreen()}</div>
 
       {showExitModal && (
         <ConfirmModal icon="🚪" title="Exit App"
-          message="Are you sure you want to exit Boss Meri?"
+          message="Are you sure you want to exit Market Boss?"
           confirmLabel="Exit" confirmClass="danger"
           onConfirm={handleExitConfirm} onCancel={() => setShowExitModal(false)} />
       )}
       {showLogoutModal && (
         <ConfirmModal icon="👋" title="Log Out"
-          message="Are you sure you want to log out of Boss Meri?"
+          message="Are you sure you want to log out of Market Boss?"
           confirmLabel="Log Out" confirmClass="danger"
           onConfirm={handleLogoutConfirm} onCancel={() => setShowLogoutModal(false)} />
       )}
