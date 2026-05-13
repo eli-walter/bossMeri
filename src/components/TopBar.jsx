@@ -1,12 +1,13 @@
+// src/components/TopBar.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import './TopBar.css';
 
 const NAV_ITEMS = [
-  { key: 'dashboard',    label: 'Dashboard',     icon: '🏠' },
-  { key: 'otaManKaon',  label: 'Ota Man Kaon',  icon: '📋' },
+  { key: 'dashboard',     label: 'Dashboard',     icon: '🏠' },
+  { key: 'otaManKaon',   label: 'Ota Man Kaon',  icon: '📋' },
   { key: 'notifications', label: 'Notifications', icon: '🔔' },
-  { key: 'users',        label: 'Users',          icon: '👥' },
-  { key: 'settings',     label: 'Settings',       icon: '⚙️' },
+  { key: 'users',         label: 'Users',          icon: '👥' },
+  { key: 'settings',      label: 'Settings',       icon: '⚙️' },
 ];
 
 const TopBar = ({ activeScreen, onNavigate, onLogout, userName }) => {
@@ -33,11 +34,11 @@ const TopBar = ({ activeScreen, onNavigate, onLogout, userName }) => {
     <div className="bm-topbar">
       {/* Left: App Icon */}
       <div className="bm-topbar-icon">
-        <img src={process.env.PUBLIC_URL + "/assets/topbar.png"} alt="Boss Meri" className="bm-topbar-icon-img" />
+        <img src={process.env.PUBLIC_URL + "/assets/topbar.png"} alt="Market Boss" className="bm-topbar-icon-img" />
       </div>
 
       {/* Centre: App Name */}
-      <div className="bm-topbar-title">Boss Meri</div>
+      <div className="bm-topbar-title">Market Boss</div>
 
       {/* Right: Hamburger */}
       <div className="bm-topbar-right" ref={menuRef}>

@@ -1,4 +1,9 @@
 // src/components/Users.jsx
+//
+// Change from original: AddUserModal now includes a `status` field (Mr / Ms / Mrs)
+// which is saved to the `users` Firestore document. This allows Notifications.jsx
+// to address customers with the correct title, e.g. "Mr. John" or "Ms. Ana".
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { initializeApp, getApps } from 'firebase/app';
 import {
@@ -14,8 +19,6 @@ import { db, firebaseConfig } from '../firebase';
 import './Users.css';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-// Kaon Lo Eli's login converts a plain username → username@kaon.app
-// So we must create Firebase Auth accounts in that same format.
 const toLoginEmail = (username) => `${username.trim().toLowerCase()}@kaon.app`;
 
 const getInitials = (name) => {
@@ -80,7 +83,7 @@ const validateEdit = ({ fullName, whatsapp }) => {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 const FieldError = ({ msg }) => msg ? <div className="bmu-field-error">{msg}</div> : null;
-const Spinner = () => <div className="bmu-spinner" />;
+const Spinner    = () => <div className="bmu-spinner" />;
 
 const Modal = ({ onClose, children }) => (
   <div className="bmu-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
@@ -88,9 +91,25 @@ const Modal = ({ onClose, children }) => (
   </div>
 );
 
-/** Add User Modal — uses username, not email, matching Kaon Lo Eli's login */
+/** Status selector: Mr / Ms / Mrs */
+const StatusSelect = ({ value, onChange }) => (
+  <div className="bmu-status-row">
+    {['Mr', 'Ms', 'Mrs'].map((s) => (
+      <button
+        key={s}
+        type="button"
+        className={`bmu-status-btn ${value === s ? 'active' : ''}`}
+        onClick={() => onChange(s)}
+      >
+        {s}
+      </button>
+    ))}
+  </div>
+);
+
+/** Add User Modal */
 const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
-  const EMPTY = { username: '', fullName: '', whatsapp: '', password: '', confirmPassword: '' };
+  const EMPTY = { status: 'Mr', username: '', fullName: '', whatsapp: '', password: '', confirmPassword: '' };
   const [form, setForm] = useState(EMPTY);
   const [errors, setErrors] = useState({});
   const [showPwd, setShowPwd] = useState(false);
@@ -115,6 +134,12 @@ const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
       </div>
 
       <div className="bmu-form-scroll">
+        {/* Status */}
+        <div className="bmu-field">
+          <label className="bmu-label">Status <span className="bmu-required">*</span></label>
+          <StatusSelect value={form.status} onChange={(s) => setForm((f) => ({ ...f, status: s }))} />
+        </div>
+
         {/* Username */}
         <div className="bmu-field">
           <label className="bmu-label">Username <span className="bmu-required">*</span></label>
@@ -209,7 +234,11 @@ const AddUserModal = ({ onClose, onSave, saving, saveError }) => {
 
 /** Edit User Modal */
 const EditUserModal = ({ user, onClose, onSave, saving, saveError }) => {
-  const [form, setForm] = useState({ fullName: user.fullName || '', whatsapp: user.whatsapp || '' });
+  const [form, setForm] = useState({
+    status:    user.status   || 'Mr',
+    fullName:  user.fullName || '',
+    whatsapp:  user.whatsapp || '',
+  });
   const [errors, setErrors] = useState({});
   const set = (field) => (e) => setForm((f) => ({ ...f, [field]: e.target.value }));
 
@@ -233,6 +262,11 @@ const EditUserModal = ({ user, onClose, onSave, saving, saveError }) => {
       </div>
 
       <div className="bmu-form-scroll">
+        {/* Status */}
+        <div className="bmu-field">
+          <label className="bmu-label">Status</label>
+          <StatusSelect value={form.status} onChange={(s) => setForm((f) => ({ ...f, status: s }))} />
+        </div>
         <div className="bmu-field">
           <label className="bmu-label">Full Name <span className="bmu-required">*</span></label>
           <input className={`bmu-input ${errors.fullName ? 'error' : ''}`}
@@ -278,7 +312,7 @@ const ConfirmModal = ({ icon, title, message, confirmLabel, danger, onConfirm, o
   </div>
 );
 
-/** User profile modal — shown when a name is tapped in the list */
+/** User profile modal */
 const UserProfileModal = ({ user, onClose, onEdit, onToggleActive, onDelete }) => {
   const color = pickColor(user.uid);
   return (
@@ -288,7 +322,9 @@ const UserProfileModal = ({ user, onClose, onEdit, onToggleActive, onDelete }) =
           {getInitials(user.fullName)}
         </div>
         <div className="bmu-profile-header-info">
-          <div className="bmu-modal-title">{user.fullName}</div>
+          <div className="bmu-modal-title">
+            {user.status ? `${user.status}. ` : ''}{user.fullName}
+          </div>
           <div className="bmu-modal-sub">@{user.username || user.loginEmail?.replace('@kaon.app','')}</div>
           <span className={`bmu-badge ${user.active ? 'bmu-badge-active' : 'bmu-badge-disabled'}`}>
             {user.active ? 'Active' : 'Disabled'}
@@ -339,7 +375,7 @@ const UserProfileModal = ({ user, onClose, onEdit, onToggleActive, onDelete }) =
   );
 };
 
-/** Simple name-row — shown in the list (no card) */
+/** Simple name-row in list */
 const UserListItem = ({ user, onClick }) => (
   <div
     className={`bmu-list-item ${!user.active ? 'bmu-list-item-disabled' : ''}`}
@@ -348,7 +384,9 @@ const UserListItem = ({ user, onClick }) => (
     <div className="bmu-avatar bmu-avatar-sm" style={{ background: pickColor(user.uid) }}>
       {getInitials(user.fullName)}
     </div>
-    <div className="bmu-list-name">{user.fullName}</div>
+    <div className="bmu-list-name">
+      {user.status ? `${user.status}. ` : ''}{user.fullName}
+    </div>
     <div className={`bmu-badge ${user.active ? 'bmu-badge-active' : 'bmu-badge-disabled'}`}>
       {user.active ? 'Active' : 'Off'}
     </div>
@@ -358,16 +396,16 @@ const UserListItem = ({ user, onClick }) => (
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 const Users = () => {
-  const [users, setUsers]         = useState([]);
-  const [loading, setLoading]     = useState(true);
+  const [users, setUsers]           = useState([]);
+  const [loading, setLoading]       = useState(true);
   const [fetchError, setFetchError] = useState('');
-  const [search, setSearch]       = useState('');
+  const [search, setSearch]         = useState('');
 
-  const [showAdd, setShowAdd]         = useState(false);
-  const [profileTarget, setProfileTarget] = useState(null); // name-click → profile modal
-  const [editTarget, setEditTarget]   = useState(null);
-  const [deleteTarget, setDeleteTarget] = useState(null);
-  const [toggleTarget, setToggleTarget] = useState(null);
+  const [showAdd, setShowAdd]             = useState(false);
+  const [profileTarget, setProfileTarget] = useState(null);
+  const [editTarget, setEditTarget]       = useState(null);
+  const [deleteTarget, setDeleteTarget]   = useState(null);
+  const [toggleTarget, setToggleTarget]   = useState(null);
 
   const [saving, setSaving]       = useState(false);
   const [saveError, setSaveError] = useState('');
@@ -375,7 +413,7 @@ const Users = () => {
   const fetchUsers = useCallback(async () => {
     setLoading(true); setFetchError('');
     try {
-      const q = query(collection(db, 'users'), orderBy('createdAt', 'asc'));
+      const q    = query(collection(db, 'users'), orderBy('createdAt', 'asc'));
       const snap = await getDocs(q);
       setUsers(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     } catch (err) {
@@ -386,24 +424,25 @@ const Users = () => {
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
-  // ── Add user — creates Firebase Auth with username@kaon.app format ─────────
-  const handleAddSave = async ({ username, fullName, whatsapp, password }) => {
+  // ── Add user ──────────────────────────────────────────────────────────────
+  const handleAddSave = async ({ status, username, fullName, whatsapp, password }) => {
     setSaving(true); setSaveError('');
     const loginEmail = toLoginEmail(username);
     try {
       const secondaryAuth = getSecondaryAuth();
-      const credential = await createUserWithEmailAndPassword(secondaryAuth, loginEmail, password);
-      const { uid } = credential.user;
+      const credential    = await createUserWithEmailAndPassword(secondaryAuth, loginEmail, password);
+      const { uid }       = credential.user;
       await secondarySignOut(secondaryAuth);
 
       await setDoc(doc(db, 'users', uid), {
         uid,
-        username: username.trim().toLowerCase(),
+        status:     status || 'Mr',       // Mr / Ms / Mrs
+        username:   username.trim().toLowerCase(),
         loginEmail,
-        fullName: fullName.trim(),
-        whatsapp: whatsapp.trim(),
-        active: true,
-        createdAt: serverTimestamp(),
+        fullName:   fullName.trim(),
+        whatsapp:   whatsapp.trim(),
+        active:     true,
+        createdAt:  serverTimestamp(),
       });
 
       setShowAdd(false);
@@ -419,10 +458,11 @@ const Users = () => {
     } finally { setSaving(false); }
   };
 
-  const handleEditSave = async ({ fullName, whatsapp }) => {
+  const handleEditSave = async ({ status, fullName, whatsapp }) => {
     setSaving(true); setSaveError('');
     try {
       await updateDoc(doc(db, 'users', editTarget.uid), {
+        status:   status || 'Mr',
         fullName: fullName.trim(),
         whatsapp: whatsapp.trim(),
       });
@@ -523,8 +563,6 @@ const Users = () => {
             <div className="bmu-empty-text">No users match "<strong>{search}</strong>".</div>
           </div>
         )}
-
-        {/* Name-only list */}
         {!loading && !fetchError && filtered.length > 0 && (
           <div className="bmu-list-container">
             {filtered.map((u) => (
@@ -550,7 +588,7 @@ const Users = () => {
         <UserProfileModal
           user={profileTarget}
           onClose={() => setProfileTarget(null)}
-          onEdit={(u) => { setSaveError(''); setEditTarget(u); }}
+          onEdit={(u)  => { setSaveError(''); setEditTarget(u); }}
           onToggleActive={(u) => setToggleTarget(u)}
           onDelete={(u) => setDeleteTarget(u)}
         />

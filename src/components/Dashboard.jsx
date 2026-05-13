@@ -1,3 +1,4 @@
+// src/components/Dashboard.jsx
 import React from 'react';
 import './Dashboard.css';
 
@@ -32,12 +33,35 @@ const CARDS = [
   },
 ];
 
-const Dashboard = ({ onNavigate }) => {
+/**
+ * Dashboard receives `adminProfile` from App.jsx which is fetched from the
+ * Firestore `adminProfiles` collection.
+ * Expected shape: { status: 'Mr'|'Ms'|'Mrs'|'', fullName: string, email: string }
+ *
+ * Admins are manually added to Firestore with their details. The greeting
+ * uses their status (Mr/Ms/Mrs) and first name, e.g. "Welcome, Mr. John 👑".
+ */
+const Dashboard = ({ onNavigate, adminProfile }) => {
+  // Build a personalised greeting from the admin profile
+  const buildGreeting = () => {
+    if (!adminProfile) return 'Welcome, Boss 👑';
+    const status    = adminProfile.status ? `${adminProfile.status}.` : '';
+    const firstName = adminProfile.fullName?.trim().split(/\s+/)[0] || 'Boss';
+    return `Welcome, ${status ? status + ' ' : ''}${firstName} 👑`;
+  };
+
+  const subGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning! What would you like to manage today?';
+    if (hour < 17) return 'Good afternoon! What would you like to manage today?';
+    return 'Good evening! What would you like to manage today?';
+  };
+
   return (
     <div className="bm-dashboard">
       <div className="bm-dashboard-greeting">
-        <h2>Welcome, Boss 👑</h2>
-        <p>What would you like to manage today?</p>
+        <h2>{buildGreeting()}</h2>
+        <p>{subGreeting()}</p>
       </div>
 
       <div className="bm-cards-grid">

@@ -1,135 +1,144 @@
+/* src/components/Login.css */
+
+/* ── Screen & Card ──────────────────────────────────────────────────────── */
 .bm-login-screen {
-  position: fixed;
-  inset: 0;
-  background: linear-gradient(135deg, #4A0080 0%, #B8860B 100%);
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  background: linear-gradient(135deg, #2d0050 0%, #4A0080 50%, #6B0099 100%);
+  padding: 1rem;
 }
 
 .bm-login-card {
-  background: white;
-  border-radius: 22px;
-  padding: 42px 36px;
+  background: #ffffff;
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.28);
+  padding: 2rem 1.75rem 1.75rem;
   width: 100%;
-  max-width: 400px;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.35);
-  animation: bmCardIn 0.4s ease-out;
+  max-width: 360px;
 }
 
-@keyframes bmCardIn {
-  from { transform: translateY(40px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-
+/* ── Header ─────────────────────────────────────────────────────────────── */
 .bm-login-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 1.75rem;
 }
 
 .bm-login-icon {
-  width: 35vw;
-  max-width: 160px;
-  height: auto;
-  border-radius: 22%;
-  margin-bottom: 16px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 1rem;
+  margin-bottom: 0.75rem;
+  object-fit: cover;
 }
 
 .bm-login-header h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #4A0080 0%, #B8860B 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 6px 0;
-  padding: 0;
-  position: static;
-  width: auto;
-  text-shadow: none;
-  letter-spacing: 1px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d0050;
+  margin: 0 0 0.25rem;
 }
 
 .bm-login-header p {
-  color: #868e96;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0;
 }
 
+/* ── Form ────────────────────────────────────────────────────────────────── */
 .bm-login-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 1rem;
 }
 
 .bm-login-field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0.35rem;
 }
 
 .bm-login-field label {
+  font-size: 0.82rem;
   font-weight: 600;
-  color: #4A0080;
-  font-size: 0.88rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: #444;
+  letter-spacing: 0.02em;
 }
 
 .bm-login-field input {
-  padding: 13px 16px;
-  border: 2px solid #e9ecef;
-  border-radius: 10px;
-  font-size: 1rem;
-  background: #faf8ff;
-  transition: all 0.3s ease;
-  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border: 1.5px solid #ddd;
+  border-radius: 0.6rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #fafafa;
 }
 
 .bm-login-field input:focus {
-  outline: none;
   border-color: #4A0080;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(74,0,128,0.1);
+  background: #fff;
 }
 
+/* ── Error / Success messages ────────────────────────────────────────────── */
 .bm-login-error {
-  background: #fff5f5;
-  border: 1px solid #ffcccc;
-  color: #c0392b;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-size: 0.88rem;
+  background: #fff0f0;
+  color: #c00;
+  border: 1px solid #ffc0c0;
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.85rem;
   text-align: center;
 }
 
+.bm-login-success {
+  background: #f0fff4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  border-radius: 0.5rem;
+  padding: 0.75rem 0.85rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* ── Buttons ─────────────────────────────────────────────────────────────── */
 .bm-login-btn {
-  background: linear-gradient(135deg, #4A0080 0%, #B8860B 100%);
-  color: white;
+  padding: 0.75rem;
+  background: #4A0080;
+  color: #fff;
   border: none;
-  padding: 14px;
-  border-radius: 10px;
-  font-size: 1.05rem;
-  font-weight: 700;
+  border-radius: 0.7rem;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(74,0,128,0.35);
-  margin-top: 4px;
-  width: 100%;
-  letter-spacing: 0.5px;
+  transition: background 0.2s, opacity 0.2s;
 }
 
 .bm-login-btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(74,0,128,0.45);
+  background: #6B0099;
 }
 
-.bm-login-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+.bm-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
-@media (max-width: 768px) {
-  .bm-login-card { padding: 30px 22px; }
-  .bm-login-header h1 { font-size: 1.6rem; }
+/* Forgot-password / Back-to-login text link */
+.bm-login-link {
+  background: none;
+  border: none;
+  color: #4A0080;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  padding: 0.25rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.bm-login-link:hover {
+  color: #6B0099;
 }
